@@ -1,0 +1,13 @@
+type ExpenseData {
+  id: ID!
+  userId: String!
+  expenseDate: String!
+  regFixedCost: Int!
+  irregFixedCost: Int!
+  regVarCost: Int!
+  irregVarCost: Int!
+}
+
+type Query {
+  getExpData(userId: String): ExpenseData
+}

@@ -1,0 +1,15 @@
+const UNKNOWN_ERROR_MESSAGE = "想定外のエラーが発生しました。";
+const APPLICATION_ERROR_MESSAGE = "アプリケーションエラーが発生しました。";
+const S3_OBJECT_NOT_FOUND =
+  "s3バケットから指定のファイルを取得できませんでした";
+
+const CATEGORY_LIST_KEY = process.env.CATEGORY_LIST;
+const DYNAMO_DB_TABLE_NAME = process.env.DYNAMO_DB_TABLE_NAME;
+
+export {
+  UNKNOWN_ERROR_MESSAGE,
+  APPLICATION_ERROR_MESSAGE,
+  S3_OBJECT_NOT_FOUND,
+  CATEGORY_LIST_KEY,
+  DYNAMO_DB_TABLE_NAME,
+};
