@@ -39,11 +39,13 @@ export class BackStack extends cdk.Stack {
         role: aggregateLambdaExecutionRole,
         environment: {
           POWERTOOLS_SERVICE_NAME: "ExpenseTrackerApp",
-          POWERTOOLS_LOG_LEVEL: "DEBUG",
           CATEGORY_LIST: "ExpenseTrackerApp-categoryList",
           DYNAMO_DB_TABLE_NAME: "ExpenseData",
         },
         tracing: lambda.Tracing.ACTIVE,
+        loggingFormat: lambda.LoggingFormat.JSON,
+        applicationLogLevel: lambda.ApplicationLogLevel.INFO,
+        systemLogLevel: lambda.SystemLogLevel.INFO,
         timeout: cdk.Duration.seconds(10),
       }
     );
@@ -141,7 +143,7 @@ export class BackStack extends cdk.Stack {
         appsync.KeyCondition.eq("userId", "userId"),
         "expenseDataByUser"
       ),
-      responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultItem(),
+      responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
     });
   }
 }

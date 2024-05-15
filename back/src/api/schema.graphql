@@ -9,5 +9,5 @@ type ExpenseData {
 }
 
 type Query {
-  getExpData(userId: String): ExpenseData
+  getExpData(userId: String): [ExpenseData]
 }
