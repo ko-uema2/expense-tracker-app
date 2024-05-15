@@ -1,3 +1,6 @@
+/**
+ * Represents the AWS CDK stack for the backend of the expense tracker app.
+ */
 import * as cdk from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -8,9 +11,16 @@ import { Construct } from "constructs";
 import path = require("path");
 
 export class BackStack extends cdk.Stack {
+  /**
+   * Constructs a new instance of the BackStack class.
+   * @param scope The parent construct.
+   * @param id The construct ID.
+   * @param props The stack properties.
+   */
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    // Create the IAM role for the aggregate lambda function
     const aggregateLambdaExecutionRole = new iam.Role(
       this,
       "AggregateLambdaExecutionRole",
@@ -30,6 +40,7 @@ export class BackStack extends cdk.Stack {
       }
     );
 
+    // Create the aggregate lambda function
     const aggregateLambda = new cdk.aws_lambda_nodejs.NodejsFunction(
       this,
       "AggregateLambda",
@@ -39,15 +50,18 @@ export class BackStack extends cdk.Stack {
         role: aggregateLambdaExecutionRole,
         environment: {
           POWERTOOLS_SERVICE_NAME: "ExpenseTrackerApp",
-          POWERTOOLS_LOG_LEVEL: "DEBUG",
           CATEGORY_LIST: "ExpenseTrackerApp-categoryList",
           DYNAMO_DB_TABLE_NAME: "ExpenseData",
         },
         tracing: lambda.Tracing.ACTIVE,
+        loggingFormat: lambda.LoggingFormat.JSON,
+        applicationLogLevel: lambda.ApplicationLogLevel.INFO,
+        systemLogLevel: lambda.SystemLogLevel.INFO,
         timeout: cdk.Duration.seconds(10),
       }
     );
 
+    // Add necessary permissions to the aggregate lambda function
     aggregateLambda.addToRolePolicy(
       new iam.PolicyStatement({
         actions: [
@@ -66,12 +80,14 @@ export class BackStack extends cdk.Stack {
       })
     );
 
+    // Create the S3 bucket for expense data
     const expenseDataBucket = new s3.Bucket(this, "ExpenseDataBucket", {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
       publicReadAccess: true,
     });
 
+    // Define the bucket policy to deny PutObject action for CSV files
     const expenseDataBucketPolicy = new iam.PolicyStatement({
       effect: iam.Effect.DENY,
       principals: [new iam.AnyPrincipal()],
@@ -79,13 +95,16 @@ export class BackStack extends cdk.Stack {
       notResources: [`arn:aws:s3:::${expenseDataBucket.bucketName}/*.csv`],
     });
 
+    // Add the bucket policy to the expense data bucket
     expenseDataBucket.addToResourcePolicy(expenseDataBucketPolicy);
 
+    // Add event notification to the expense data bucket
     expenseDataBucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
       new cdk.aws_s3_notifications.LambdaDestination(aggregateLambda)
     );
 
+    // Create the DynamoDB table for expense data
     const ExpenseDataTable = new dynamodb.TableV2(this, "ExpenseDataTable", {
       tableName: "ExpenseData",
       partitionKey: {
@@ -113,6 +132,7 @@ export class BackStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // Create the GraphQL API for the expense tracker
     const expenseTrackerAPi = new appsync.GraphqlApi(
       this,
       "ExpenseTrackerAPI",
@@ -129,11 +149,13 @@ export class BackStack extends cdk.Stack {
       }
     );
 
+    // Add DynamoDB data source to the GraphQL API
     const expenseDataSource = expenseTrackerAPi.addDynamoDbDataSource(
       "ExpenseDataSource",
       ExpenseDataTable
     );
 
+    // Create resolver for the getExpData query
     expenseDataSource.createResolver("getExpData", {
       typeName: "Query",
       fieldName: "getExpData",
@@ -141,7 +163,7 @@ export class BackStack extends cdk.Stack {
         appsync.KeyCondition.eq("userId", "userId"),
         "expenseDataByUser"
       ),
-      responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultItem(),
+      responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
     });
   }
 }
