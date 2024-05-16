@@ -7,15 +7,18 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as appsync from "aws-cdk-lib/aws-appsync";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 import path = require("path");
+import { IdentityPool } from "@aws-cdk/aws-cognito-identitypool-alpha";
 
 export class BackStack extends cdk.Stack {
   /**
-   * Constructs a new instance of the BackStack class.
-   * @param scope The parent construct.
-   * @param id The construct ID.
-   * @param props The stack properties.
+   * Constructs a new instance of the `BackStack` class.
+   *
+   * @param scope - The parent construct.
+   * @param id - The identifier for the construct.
+   * @param props - The optional stack properties.
    */
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -165,5 +168,58 @@ export class BackStack extends cdk.Stack {
       ),
       responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
     });
+
+    /**
+     * Represents the user pool for the Expense Tracker App.
+     */
+    const expenseTrackerUserPool = new cognito.UserPool(
+      this,
+      "ExpenseTrackerUserPool",
+      {
+        userPoolName: "ExpenseTrackerUserPool",
+        selfSignUpEnabled: true,
+        userVerification: {
+          emailSubject: "Verify your email for Expense Tracker App",
+          emailBody:
+            "Hello {username}, Thanks for signing up to Expense Tracker App! Your verification code is {####}",
+          emailStyle: cognito.VerificationEmailStyle.CODE,
+        },
+        signInAliases: {
+          email: true,
+        },
+        standardAttributes: {
+          email: {
+            required: true,
+            mutable: true,
+          },
+        },
+        passwordPolicy: {
+          minLength: 8,
+          requireLowercase: true,
+          requireDigits: true,
+          requireSymbols: true,
+          requireUppercase: true,
+          tempPasswordValidity: cdk.Duration.days(7),
+        },
+        accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }
+    );
+
+    /**
+     * Represents the identity pool for the Expense Tracker app.
+     */
+    const expenseTrackerIDPool = new IdentityPool(
+      this,
+      "ExpenseTrackerIDPool",
+      {
+        identityPoolName: "ExpenseTrackerIDPool",
+        allowUnauthenticatedIdentities: true,
+        authenticationProviders: {
+          userPools: [],
+        },
+        roleMappings: [],
+      }
+    );
   }
 }
