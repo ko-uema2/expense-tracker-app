@@ -10,7 +10,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 import path = require("path");
-import { Authentication } from "lib/auth";
+// import { Authentication } from "lib/auth";
 import {
   IdentityPool,
   IdentityPoolProviderUrl,
