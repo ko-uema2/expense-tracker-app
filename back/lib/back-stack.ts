@@ -10,7 +10,14 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 import path = require("path");
-import { IdentityPool } from "@aws-cdk/aws-cognito-identitypool-alpha";
+import { Authentication } from "lib/auth";
+import {
+  IdentityPool,
+  IdentityPoolProviderUrl,
+  IdentityPoolRoleMapping,
+  RoleMappingRule,
+  UserPoolAuthenticationProvider,
+} from "@aws-cdk/aws-cognito-identitypool-alpha";
 
 export class BackStack extends cdk.Stack {
   /**
@@ -169,6 +176,20 @@ export class BackStack extends cdk.Stack {
       responseMappingTemplate: appsync.MappingTemplate.dynamoDbResultList(),
     });
 
+    // const expenseTrackerAuthentication = new Authentication(
+    //   this,
+    //   "Authentication"
+    // );
+
+    // const expenseTrackerAuthorization = new Authorization(
+    //   this,
+    //   "Authorization",
+    //   {
+    //     userPools: [],
+    //     roleMappings: [],
+    //   }
+    // );
+
     /**
      * Represents the user pool for the Expense Tracker App.
      */
@@ -206,6 +227,18 @@ export class BackStack extends cdk.Stack {
       }
     );
 
+    const expenseTrackerUserPoolClient = expenseTrackerUserPool.addClient(
+      "ExpenseTrackerUserPoolClient",
+      {
+        userPoolClientName: "ExpenseTrackerUserPoolClient",
+        authFlows: {
+          userPassword: true,
+          userSrp: true,
+          adminUserPassword: true,
+        },
+      }
+    );
+
     /**
      * Represents the identity pool for the Expense Tracker app.
      */
@@ -216,10 +249,75 @@ export class BackStack extends cdk.Stack {
         identityPoolName: "ExpenseTrackerIDPool",
         allowUnauthenticatedIdentities: true,
         authenticationProviders: {
-          userPools: [],
+          userPools: [
+            new UserPoolAuthenticationProvider({
+              userPool: expenseTrackerUserPool,
+            }),
+          ],
         },
-        roleMappings: [],
       }
     );
+
+    // const FederatedPrincipal = new iam.FederatedPrincipal(
+    //   "cognito-identity.amazonaws.com",
+    //   {
+    //     StringEquals: {
+    //       "cognito-identity.amazonaws.com:aud":
+    //         expenseTrackerIDPool.identityPoolId,
+    //     },
+    //     "ForAnyValue:StringLike": {
+    //       "cognito-identity.amazonaws.com:amr": "authenticated",
+    //     },
+    //   }
+    // );
+
+    // const expenseTrackerAuthenticatedRole = new iam.Role(
+    //   this,
+    //   "ExpenseTrackerAuthenticatedRole",
+    //   {
+    //     roleName: "ExpenseTrackerAuthenticatedRole",
+    //     assumedBy: FederatedPrincipal,
+    //   }
+    // );
+
+    // const authenticatedRMP: RoleMappingRule = {
+    //   claim: "cognito:groups",
+    //   claimValue: "authenticated",
+    //   mappedRole: expenseTrackerAuthenticatedRole,
+    // };
+
+    // const roleMapping: IdentityPoolRoleMapping = {
+    //   providerUrl: IdentityPoolProviderUrl.userPool(
+    //     expenseTrackerUserPool,
+    //     expenseTrackerUserPoolClient
+    //   ),
+    //   mappingKey: "ExpenseTrackerApp",
+    //   resolveAmbiguousRoles: false,
+    //   useToken: false,
+    //   rules: [authenticatedRMP],
+    // };
+
+    // expenseTrackerIDPool.addRoleMappings(roleMapping);
+
+    // new cognito.CfnUserPoolGroup(this, "ExpenseTrackerAuthenticatedGroup", {
+    //   userPoolId: expenseTrackerUserPool.userPoolId,
+    //   groupName: "expenseTrackerAuthenticatedGroup",
+    //   roleArn: expenseTrackerAuthenticatedRole.roleArn,
+    // });
+
+    // const authenticatedRMP: RoleMappingRule = {
+    //   claim: "cognito:groups",
+    //   claimValue: "authenticated",
+    //   mappedRole: expenseTrackerAuthenticatedRole,
+    // };
+
+    // const identityPoolRoleAttachment = new IdentityPoolRoleAttachment(
+    //   this,
+    //   "IdentityPoolRoleAttachment",
+    //   {
+    //     identityPool: expenseTrackerIDPool,
+    //     authenticatedRole: expenseTrackerAuthenticatedRole,
+    //   }
+    // );
   }
 }
