@@ -11,10 +11,17 @@ Amplify.configure({
       allowGuestAccess: true,
     },
   },
+  API: {
+    GraphQL: {
+      endpoint: import.meta.env.VITE_API_URL,
+      region: import.meta.env.VITE_AWS_REGION,
+      defaultAuthMode: "iam",
+    },
+  },
 });
 
-const currentConfig = Amplify.getConfig();
-console.log("Current Amplify configuration: ", currentConfig);
+// const currentConfig = Amplify.getConfig();
+// console.log("Current Amplify configuration: ", currentConfig);
 
 function App() {
   return (
