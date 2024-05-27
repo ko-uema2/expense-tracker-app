@@ -40,8 +40,6 @@ export const SignIn: FC = memo(() => {
     event.preventDefault();
     setLoading(true);
 
-    console.log(values);
-
     try {
       const response = await signIn({
         username: values.email,
@@ -55,7 +53,11 @@ export const SignIn: FC = memo(() => {
         nav("/app");
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
+      setLoading(false);
+
+      if ((error as Error).name === "UserAlreadyAuthenticatedException") {
+        nav("/app");
+      } else if (error instanceof Error) {
         setErrMsg(error.message);
         console.error(error);
       } else {
