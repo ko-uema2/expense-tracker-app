@@ -2,12 +2,14 @@ import { GetExpDataQueryVariables } from "@/API";
 import { Loading } from "@/components/form";
 import { SignOut } from "@/features/auth/components/SignOut";
 import { getExpData } from "@/graphql/queries";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthToken } from "@/hooks/useAuthToken";
+import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
   AppShell,
   Burger,
   Code,
   Group,
+  Loader,
   ScrollArea,
   Title,
 } from "@mantine/core";
@@ -91,7 +93,7 @@ const App: FC = memo(() => {
         </AppShell.Section>
       </AppShell.Navbar>
       <AppShell.Main>
-        <Suspense fallback={<Loading loading={true} />}>
+        <Suspense fallback={<div>Loading...</div>}>
           <FetchData />
         </Suspense>
       </AppShell.Main>
@@ -104,13 +106,25 @@ type PrivateRouteProps = {
 };
 
 const PrivateRoute: FC<PrivateRouteProps> = memo(({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+  const { loading, isValid, error } = useAuthToken();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/signin" replace />;
-  }
+  // TODO: 有効期限チェックにてエラーが発生した場合、エラーメッセージ記載用のコンポーネントを追加する
 
-  return <>{children}</>;
+  return (
+    <>
+      {(authStatus === "configuring" || loading) && (
+        <Loading loading={loading} />
+      )}
+      {authStatus === "unauthenticated" && (
+        <Navigate to="/auth/signin" replace />
+      )}
+      {authStatus === "authenticated" && !loading && isValid && children}
+      {authStatus === "authenticated" && !loading && !isValid && (
+        <Navigate to="/auth/signin" replace />
+      )}
+    </>
+  );
 });
 
 /**
@@ -120,9 +134,9 @@ export const privateRoutes: RouteObject[] = [
   {
     path: "/app",
     element: (
-      // <PrivateRoute>
-      <App />
-      // </PrivateRoute>
+      <PrivateRoute>
+        <App />
+      </PrivateRoute>
     ),
   },
 ];
