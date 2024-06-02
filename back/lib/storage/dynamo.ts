@@ -9,7 +9,7 @@ export class ExpenseDataTable extends Construct {
     super(scope, id);
 
     // Create the DynamoDB table for expense data
-    this.table = new dynamodb.TableV2(this, "ExpenseDataTable", {
+    this.table = new dynamodb.TableV2(this, id, {
       tableName: "ExpenseData",
       partitionKey: {
         name: "id",
