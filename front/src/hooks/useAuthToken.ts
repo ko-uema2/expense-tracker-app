@@ -1,6 +1,5 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import { useEffect, useState } from "react";
-import { set } from "zod";
 
 /**
  * Custom hook for handling authentication.

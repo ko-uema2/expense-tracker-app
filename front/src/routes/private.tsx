@@ -9,7 +9,6 @@ import {
   Burger,
   Code,
   Group,
-  Loader,
   ScrollArea,
   Title,
 } from "@mantine/core";

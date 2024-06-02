@@ -2,8 +2,7 @@ import { FC, memo } from "react";
 
 import { PasswordInput } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
-
-import { AuthInfo } from "@/features/auth";
+import { AuthInfo } from "@/features/auth/types";
 
 type Props = {
   form: UseFormReturnType<AuthInfo, (values: AuthInfo) => AuthInfo>;
