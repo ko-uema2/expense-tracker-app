@@ -33,7 +33,7 @@ export class DynamoDB extends Construct {
         },
       ],
       billing: dynamodb.Billing.onDemand(),
-      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }
 }
