@@ -2,14 +2,14 @@ import * as cdk from "aws-cdk-lib";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 
-export class ExpenseDataTable extends Construct {
+export class DynamoDB extends Construct {
   readonly table: dynamodb.TableV2;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
     // Create the DynamoDB table for expense data
-    this.table = new dynamodb.TableV2(this, "ExpenseDataTable", {
+    this.table = new dynamodb.TableV2(this, id, {
       tableName: "ExpenseData",
       partitionKey: {
         name: "id",
@@ -33,7 +33,7 @@ export class ExpenseDataTable extends Construct {
         },
       ],
       billing: dynamodb.Billing.onDemand(),
-      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }
 }
