@@ -2,9 +2,21 @@ import * as cdk from "aws-cdk-lib";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 
+/**
+ * Represents the Authentication class for the Expense Tracker App.
+ * This class creates a user pool for managing user authentication.
+ */
 export class Authentication extends Construct {
+  /**
+   * The user pool for the Expense Tracker App.
+   */
   public readonly userPool: cognito.UserPool;
 
+  /**
+   * Constructs a new instance of the Authentication class.
+   * @param scope The parent construct.
+   * @param id The construct ID.
+   */
   constructor(scope: Construct, id: string) {
     super(scope, id);
 

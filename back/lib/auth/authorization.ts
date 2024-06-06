@@ -12,11 +12,22 @@ type AuthorizationProps = {
 };
 
 /**
- * Represents the Authorization construct for the Expense Tracker app.
- * This construct creates an identity pool for managing user authentication and authorization.
+ * Represents the authorization component of the Expense Tracker app.
+ * This class creates a user pool client, an identity pool, roles for authenticated and unauthenticated users,
+ * and groups for authenticated and unauthenticated users.
  */
 export class Authorization extends Construct {
+  /**
+   * Represents the user pool for authentication.
+   */
   readonly userPool: IUserPoolAuthenticationProvider;
+
+  /**
+   * Constructs a new instance of the Authorization class.
+   * @param scope - The construct scope.
+   * @param id - The construct ID.
+   * @param props - The authorization properties.
+   */
   constructor(scope: Construct, id: string, props: AuthorizationProps) {
     super(scope, id);
 
