@@ -1,6 +1,3 @@
-/**
- * Represents the AWS CDK stack for the backend of the expense tracker app.
- */
 import * as cdk from "aws-cdk-lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as appsync from "aws-cdk-lib/aws-appsync";
@@ -60,26 +57,13 @@ export class BackStack extends cdk.Stack {
       "Authentication"
     );
 
-    // Create the user group for the Expense Tracker App.
-    // const expenseTrackerUserGroup = new AuthorizationGroupAndRole(
-    //   this,
-    //   "UserGroup",
-    //   {
-    //     userPool: expenseTrackerAuthentication.userPool,
-    //     idPool: {
-    //       idPoolId: params.idPoolId,
-    //     },
-    //   }
-    // );
-
     const expenseTrackerAuthorization = new Authorization(
       this,
       "Authorization",
       {
         userPool: expenseTrackerAuthentication.userPool,
-        // roleMappings: [expenseTrackerUserGroup.roleMapping],
-        // userPools: [],
-        // roleMappings: [],
+        bucketArn: expenseDataBucket.bucket.bucketArn,
+        appsyncArn: expenseTracker.api.arn,
       }
     );
   }

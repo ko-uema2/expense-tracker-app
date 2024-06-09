@@ -18,6 +18,12 @@ Amplify.configure({
       defaultAuthMode: "iam",
     },
   },
+  Storage: {
+    S3: {
+      bucket: import.meta.env.VITE_S3_BUCKET,
+      region: import.meta.env.VITE_AWS_REGION,
+    },
+  },
 });
 
 // const currentConfig = Amplify.getConfig();

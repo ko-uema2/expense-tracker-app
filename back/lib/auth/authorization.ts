@@ -9,6 +9,8 @@ import { Construct } from "constructs";
 
 type AuthorizationProps = {
   userPool: cognito.UserPool;
+  bucketArn: string;
+  appsyncArn: string;
 };
 
 /**
@@ -31,7 +33,7 @@ export class Authorization extends Construct {
   constructor(scope: Construct, id: string, props: AuthorizationProps) {
     super(scope, id);
 
-    const { userPool } = props;
+    const { userPool, bucketArn, appsyncArn } = props;
 
     // create a user pool client for the Expense Tracker app
     const expenseTrackerUserPoolClient = userPool.addClient(
@@ -65,8 +67,29 @@ export class Authorization extends Construct {
     );
 
     // create a role for authenticated users
-    expenseTrackerIDPool.authenticatedRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName("AWSAppSyncInvokeFullAccess")
+    const appSyncInvokePolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["appsync:GraphQL"],
+      resources: [appsyncArn + "/*"],
+    });
+
+    const s3UploadPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["s3:PutObject"],
+      resources: [
+        bucketArn + "/private/${cognito-identity.amazonaws.com:sub}/*",
+        // bucketArn + "/private/*",
+        // bucketArn + "/*",
+      ],
+    });
+
+    const authenticatedPolicy = new iam.Policy(this, "AuthenticatedPolicy", {
+      policyName: "AuthenticatedPolicy",
+      statements: [appSyncInvokePolicy, s3UploadPolicy],
+    });
+
+    expenseTrackerIDPool.authenticatedRole.attachInlinePolicy(
+      authenticatedPolicy
     );
 
     // create a role for unauthenticated users

@@ -10,6 +10,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { signUp } from "aws-amplify/auth";
 import { FC, FormEvent, memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { set } from "zod";
 
 export const SignUp: FC = memo(() => {
   const nav = useNavigate();
@@ -50,6 +51,7 @@ export const SignUp: FC = memo(() => {
       setLoading(false);
       open();
     } catch (error: unknown) {
+      setLoading(false);
       if (error instanceof Error) {
         setErrMsg(error.message);
       } else {
