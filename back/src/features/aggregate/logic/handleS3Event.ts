@@ -1,6 +1,12 @@
-import { S3_OBJECT_NOT_FOUND } from "@/features/aggregate/config/constant";
+import {
+  IDENTITY_ID_NOT_FOUND,
+  S3_OBJECT_NOT_FOUND,
+} from "@/features/aggregate/config/constant";
 import { CustomLogger } from "@/features/aggregate/utils/customLogger";
-import { asyncFuncDecorator } from "@/features/aggregate/utils/funcDecorator";
+import {
+  asyncFuncDecorator,
+  syncFuncDecorator,
+} from "@/features/aggregate/utils/funcDecorator";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { S3Event } from "aws-lambda";
 
@@ -32,13 +38,14 @@ export class HandleS3Event {
     // Extract the bucket name and key from the event
     const bucket = this.#event.Records[0].s3.bucket.name;
     // Decode the key as it may contain URL-encoded multibyte characters
-    const key = decodeURI(this.#event.Records[0].s3.object.key);
+    logger.debug(`key: ${this.#event.Records[0].s3.object.key}`);
+    const decodedKey = decodeURIComponent(this.#event.Records[0].s3.object.key);
 
-    logger.debug(key);
+    logger.debug(decodedKey);
 
     // Retrieve the file from S3
     const response = await this.#s3Client.send(
-      new GetObjectCommand({ Bucket: bucket, Key: key })
+      new GetObjectCommand({ Bucket: bucket, Key: decodedKey })
     );
     // Get the file as a Shift-JIS byte array from the response
     const shiftJISByteArray = await response.Body?.transformToByteArray();
@@ -47,5 +54,24 @@ export class HandleS3Event {
     }
 
     return shiftJISByteArray;
+  }
+
+  /**
+   * Retrieves the identity ID from the S3 event.
+   * @returns The identity ID extracted from the S3 event.
+   * @throws {Error} If the identity ID is not found in the S3 event.
+   */
+  @syncFuncDecorator
+  getIdentityId(): string {
+    const key = decodeURIComponent(this.#event.Records[0].s3.object.key);
+    const regex = /(?<=private\/)[^\/]+/;
+    const match = key.match(regex);
+    logger.info("Identity ID", { identityId: match });
+
+    if (!match) {
+      throw new Error(IDENTITY_ID_NOT_FOUND);
+    }
+
+    return match[0];
   }
 }

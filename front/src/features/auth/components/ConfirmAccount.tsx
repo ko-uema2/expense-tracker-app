@@ -50,11 +50,14 @@ export const ConfirmAccount = memo(
           confirmationCode: values.confirmationCode!,
         });
 
+        //TODO: display an error message if response is not successful
+
         console.log(response);
 
         setLoading(false);
         nav("/app");
       } catch (error: unknown) {
+        setLoading(false);
         if (error instanceof Error) {
           setErrMsg(error.message);
         } else {

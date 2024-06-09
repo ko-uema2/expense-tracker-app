@@ -41,7 +41,7 @@ export class Lambda extends Construct {
         environment: {
           POWERTOOLS_SERVICE_NAME: "ExpenseTrackerApp",
           CATEGORY_LIST: "ExpenseTrackerApp-categoryList",
-          DYNAMO_DB_TABLE_NAME: "ExpenseData",
+          DYNAMO_DB_TABLE_NAME: "ExpenseDataTable",
         },
         tracing: lambda.Tracing.ACTIVE,
         loggingFormat: lambda.LoggingFormat.JSON,
@@ -64,7 +64,7 @@ export class Lambda extends Construct {
         ],
         resources: [
           cdk.Fn.sub(
-            "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ExpenseData"
+            "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ExpenseDataTable"
           ),
         ],
       })

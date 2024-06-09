@@ -10,9 +10,9 @@ export class DynamoDB extends Construct {
 
     // Create the DynamoDB table for expense data
     this.table = new dynamodb.TableV2(this, id, {
-      tableName: "ExpenseData",
+      tableName: id,
       partitionKey: {
-        name: "id",
+        name: "userId",
         type: dynamodb.AttributeType.STRING,
       },
       sortKey: {
