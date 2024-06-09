@@ -24,10 +24,15 @@ export const FileUpload: FC = memo(() => {
 
     try {
       const session = await fetchAuthSession();
+      if (!session || !session.identityId || !session.userSub) {
+        throw new Error("No identityId or userSub found in session");
+      }
+
       const res = await uploadData({
         path: `private/${session.identityId}/${file.name}`,
         data: file,
         options: {
+          metadata: { "user-id": session.userSub },
           onProgress: (progress) => console.log(progress),
         },
       });
