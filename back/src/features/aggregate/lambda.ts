@@ -25,7 +25,6 @@ class Handler {
     // SSMから各種環境変数を取得
     const ssm = new HandleSsm();
     this.#requiredSsmVars = await ssm.getParameters();
-    console.log(this.#requiredSsmVars);
 
     new CheckSsmVar(this.#requiredSsmVars).validate();
 
@@ -40,14 +39,18 @@ class Handler {
     this.#s3Event = new HandleS3Event(event);
 
     try {
-      // 支出の分類名を配列に格納
       const categoryListArray: string[] =
         this.#requiredSsmVars.CATEGORY_LIST!.split(",");
 
+      // get the contents of the CSV file from S3
       const shiftJISByteArray = await this.#s3Event.getCSVContents();
       const csvContents = new TextDecoder("shift-jis").decode(
         shiftJISByteArray
       );
+
+      // Extract the identityId from the S3 obuject key
+      const identityId = this.#s3Event.getIdentityId();
+
       const dataHandler = new HandleExpenseData(csvContents);
       const { jsonExpenseDataArray, expenseDate } = await dataHandler.extract();
 
@@ -58,7 +61,7 @@ class Handler {
       ).sumByCategory();
 
       // DynamoDBへの書き込み
-      await this.#dynamo.write(sumByCategory, expenseDate);
+      await this.#dynamo.write(sumByCategory, expenseDate, identityId);
     } catch (error: unknown) {
       if (error instanceof Error) {
         logger.error(APPLICATION_ERROR_MESSAGE, error);

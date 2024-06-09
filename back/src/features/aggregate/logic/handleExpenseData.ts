@@ -1,3 +1,7 @@
+import {
+  EXPENSE_DATA_ARRAY_EMPTY,
+  INVALID_DATE_FORMAT,
+} from "@/features/aggregate/config/constant";
 import { CSVToJson } from "@/features/aggregate/logic/csvToJson";
 import { Expense } from "@/features/aggregate/types/expense";
 import { syncFuncDecorator } from "@/features/aggregate/utils/funcDecorator";
@@ -44,7 +48,7 @@ export class HandleExpenseData {
   private extractExpenseMonth(expenseDataArray: Expense[]): string {
     // ガード節
     if (!expenseDataArray.length) {
-      throw new Error("Expense data array is empty.");
+      throw new Error(EXPENSE_DATA_ARRAY_EMPTY);
     }
 
     // 日付から年と月を抽出
@@ -52,7 +56,7 @@ export class HandleExpenseData {
     const match = expenseDataArray[0]["日付"].match(dateRegex);
 
     if (!match) {
-      throw new Error("Invalid date format.");
+      throw new Error(INVALID_DATE_FORMAT);
     }
 
     // 年と月をハイフンで結合
