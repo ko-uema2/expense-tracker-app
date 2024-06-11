@@ -1,7 +1,6 @@
-import { GetExpDataQueryVariables } from "@/API";
 import { Loading } from "@/components/form";
 import { SignOut } from "@/features/auth/components/SignOut";
-import { getExpData } from "@/graphql/queries";
+import { Financial } from "@/features/financial";
 import { useAuthToken } from "@/hooks/useAuthToken";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
@@ -13,46 +12,8 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { generateClient } from "aws-amplify/api";
 import { FC, ReactNode, Suspense, memo } from "react";
 import { Navigate, RouteObject } from "react-router-dom";
-import useSWR from "swr";
-
-const graphqlClient = generateClient();
-const queryInput: GetExpDataQueryVariables = { userId: "user1" };
-const fetchExpData = async () =>
-  graphqlClient
-    .graphql({
-      query: getExpData,
-      variables: queryInput,
-    })
-    .then((res) => {
-      return res;
-    });
-
-const FetchData: FC = memo(() => {
-  const { data, error } = useSWR("dimmyURL", fetchExpData, { suspense: true });
-  console.log(data, error);
-
-  return (
-    <>
-      {!data ? (
-        <div>no data</div>
-      ) : (
-        data.data.getExpData?.map((item) => (
-          <div key={item?.id}>
-            <div>{item?.expenseDate}</div>
-            <div>{item?.regFixedCost}</div>
-            <div>{item?.irregFixedCost}</div>
-            <div>{item?.regVarCost}</div>
-            <div>{item?.irregVarCost}</div>
-            <br />
-          </div>
-        ))
-      )}
-    </>
-  );
-});
 
 const App: FC = memo(() => {
   const [opened, { toggle }] = useDisclosure();
@@ -93,7 +54,7 @@ const App: FC = memo(() => {
       </AppShell.Navbar>
       <AppShell.Main>
         <Suspense fallback={<div>Loading...</div>}>
-          <FetchData />
+          <Financial />
         </Suspense>
       </AppShell.Main>
     </AppShell>

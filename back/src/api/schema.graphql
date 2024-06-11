@@ -1,5 +1,4 @@
 type ExpenseData {
-  id: ID!
   userId: String!
   expenseDate: String!
   regFixedCost: Int!
@@ -9,5 +8,5 @@ type ExpenseData {
 }
 
 type Query {
-  getExpData(userId: String): [ExpenseData]
+  getExpData(userId: String!): [ExpenseData]
 }

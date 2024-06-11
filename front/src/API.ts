@@ -4,7 +4,6 @@
 
 export type ExpenseData = {
   __typename: "ExpenseData",
-  id: string,
   userId: string,
   expenseDate: string,
   regFixedCost: number,
@@ -14,13 +13,12 @@ export type ExpenseData = {
 };
 
 export type GetExpDataQueryVariables = {
-  userId?: string | null,
+  userId: string,
 };
 
 export type GetExpDataQuery = {
   getExpData?:  Array< {
     __typename: "ExpenseData",
-    id: string,
     userId: string,
     expenseDate: string,
     regFixedCost: number,
