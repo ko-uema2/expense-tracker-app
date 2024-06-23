@@ -7,6 +7,7 @@ import { Group, Modal, TextInput } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import { confirmSignUp } from "aws-amplify/auth";
 import { FormEvent, memo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -108,3 +109,5 @@ export const ConfirmAccount = memo(
     );
   }
 );
+
+ConfirmAccount.displayName = "ConfirmAccount";

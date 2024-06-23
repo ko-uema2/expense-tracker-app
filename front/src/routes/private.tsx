@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, ReactNode, Suspense, memo } from "react";
+import React from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 
 const App: FC = memo(() => {
@@ -22,7 +23,11 @@ const App: FC = memo(() => {
     <AppShell
       className="p-4"
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
+      navbar={{
+        width: { base: 150, md: 150, lg: 200 },
+        breakpoint: "sm",
+        collapsed: { mobile: !opened },
+      }}
     >
       <AppShell.Header className="border-b border-base-300">
         <Group className="h-full px-2 justify-between">
@@ -38,7 +43,7 @@ const App: FC = memo(() => {
       <AppShell.Navbar className="p-4 border-r border-base-300">
         <AppShell.Section>
           <Group className="justify-between h-10">
-            <Title className="ml-2 text-base-700 text-lg">Collections</Title>
+            <Title className="ml-2 text-base-700 text-lg">Menu</Title>
           </Group>
         </AppShell.Section>
         <AppShell.Section
@@ -100,3 +105,6 @@ export const privateRoutes: RouteObject[] = [
     ),
   },
 ];
+
+App.displayName = "App";
+PrivateRoute.displayName = "PrivateRoute";

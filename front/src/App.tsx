@@ -1,8 +1,6 @@
 import { AppProvider } from "@/providers/AppProvider";
 import { AppRoutes } from "@/routes";
 import { Amplify } from "aws-amplify";
-import "@mantine/charts/styles.css";
-import "@mantine/notifications/styles.css";
 
 Amplify.configure({
   Auth: {

@@ -1,13 +1,18 @@
 import { Text, UnstyledButton } from "@mantine/core";
 import { signOut } from "aws-amplify/auth";
 import { FC, memo } from "react";
+import React from "react";
 import { BsBoxArrowLeft } from "react-icons/bs";
 
 export const SignOut: FC = memo(() => {
   const handleSignout = async () => {
     try {
       await signOut({ global: true });
-    } catch (error: unknown) {}
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+    }
   };
 
   return (
@@ -20,3 +25,5 @@ export const SignOut: FC = memo(() => {
     </UnstyledButton>
   );
 });
+
+SignOut.displayName = "SignOut";

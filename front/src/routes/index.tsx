@@ -1,3 +1,4 @@
+import React from "react";
 import { privateRoutes } from "@/routes/private";
 import { publicRoutes } from "@/routes/public";
 import { Navigate, useRoutes } from "react-router-dom";

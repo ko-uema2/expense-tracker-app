@@ -24,7 +24,7 @@ const fetchExpData = async () => {
 
 export const useExpData = (): {
   data: GraphQLResult<GetExpDataQuery>;
-  error: any;
+  error: Error | undefined;
 } => {
   return useSWR("dummyURL", fetchExpData, { suspense: true });
 };
