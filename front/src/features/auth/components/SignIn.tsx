@@ -17,6 +17,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useClickOutside } from "@mantine/hooks";
 import { signIn } from "aws-amplify/auth";
 import { FC, FormEvent, memo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export const SignIn: FC = memo(() => {
@@ -120,3 +121,5 @@ export const SignIn: FC = memo(() => {
     </Container>
   );
 });
+
+SignIn.displayName = "SignIn";

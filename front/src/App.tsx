@@ -26,9 +26,6 @@ Amplify.configure({
   },
 });
 
-// const currentConfig = Amplify.getConfig();
-// console.log("Current Amplify configuration: ", currentConfig);
-
 function App() {
   return (
     <AppProvider>

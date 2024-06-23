@@ -1,7 +1,6 @@
-import { GetExpDataQueryVariables } from "@/API";
 import { Loading } from "@/components/form";
 import { SignOut } from "@/features/auth/components/SignOut";
-import { getExpData } from "@/graphql/queries";
+import { Financial } from "@/features/financial";
 import { useAuthToken } from "@/hooks/useAuthToken";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
@@ -13,46 +12,9 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { generateClient } from "aws-amplify/api";
 import { FC, ReactNode, Suspense, memo } from "react";
+import React from "react";
 import { Navigate, RouteObject } from "react-router-dom";
-import useSWR from "swr";
-
-const graphqlClient = generateClient();
-const queryInput: GetExpDataQueryVariables = { userId: "user1" };
-const fetchExpData = async () =>
-  graphqlClient
-    .graphql({
-      query: getExpData,
-      variables: queryInput,
-    })
-    .then((res) => {
-      return res;
-    });
-
-const FetchData: FC = memo(() => {
-  const { data, error } = useSWR("dimmyURL", fetchExpData, { suspense: true });
-  console.log(data, error);
-
-  return (
-    <>
-      {!data ? (
-        <div>no data</div>
-      ) : (
-        data.data.getExpData?.map((item) => (
-          <div key={item?.id}>
-            <div>{item?.expenseDate}</div>
-            <div>{item?.regFixedCost}</div>
-            <div>{item?.irregFixedCost}</div>
-            <div>{item?.regVarCost}</div>
-            <div>{item?.irregVarCost}</div>
-            <br />
-          </div>
-        ))
-      )}
-    </>
-  );
-});
 
 const App: FC = memo(() => {
   const [opened, { toggle }] = useDisclosure();
@@ -61,7 +23,11 @@ const App: FC = memo(() => {
     <AppShell
       className="p-4"
       header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
+      navbar={{
+        width: { base: 150, md: 150, lg: 200 },
+        breakpoint: "sm",
+        collapsed: { mobile: !opened },
+      }}
     >
       <AppShell.Header className="border-b border-base-300">
         <Group className="h-full px-2 justify-between">
@@ -77,7 +43,7 @@ const App: FC = memo(() => {
       <AppShell.Navbar className="p-4 border-r border-base-300">
         <AppShell.Section>
           <Group className="justify-between h-10">
-            <Title className="ml-2 text-base-700 text-lg">Collections</Title>
+            <Title className="ml-2 text-base-700 text-lg">Menu</Title>
           </Group>
         </AppShell.Section>
         <AppShell.Section
@@ -93,7 +59,7 @@ const App: FC = memo(() => {
       </AppShell.Navbar>
       <AppShell.Main>
         <Suspense fallback={<div>Loading...</div>}>
-          <FetchData />
+          <Financial />
         </Suspense>
       </AppShell.Main>
     </AppShell>
@@ -139,3 +105,6 @@ export const privateRoutes: RouteObject[] = [
     ),
   },
 ];
+
+App.displayName = "App";
+PrivateRoute.displayName = "PrivateRoute";

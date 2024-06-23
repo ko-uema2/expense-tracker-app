@@ -4,6 +4,7 @@ import { MIME_TYPES } from "@mantine/dropzone";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { uploadData } from "aws-amplify/storage";
 import { FC, FormEvent, memo, useState } from "react";
+import React from "react";
 
 export const FileUpload: FC = memo(() => {
   const [uploading, setUploading] = useState<boolean>(false);
@@ -24,10 +25,15 @@ export const FileUpload: FC = memo(() => {
 
     try {
       const session = await fetchAuthSession();
-      const res = await uploadData({
+      if (!session || !session.identityId || !session.userSub) {
+        throw new Error("No identityId or userSub found in session");
+      }
+
+      await uploadData({
         path: `private/${session.identityId}/${file.name}`,
         data: file,
         options: {
+          metadata: { "user-id": session.userSub },
           onProgress: (progress) => console.log(progress),
         },
       });
@@ -49,3 +55,5 @@ export const FileUpload: FC = memo(() => {
     </>
   );
 });
+
+FileUpload.displayName = "FileUpload";

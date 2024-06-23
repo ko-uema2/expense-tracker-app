@@ -43,13 +43,10 @@ class Handler {
         this.#requiredSsmVars.CATEGORY_LIST!.split(",");
 
       // get the contents of the CSV file from S3
-      const shiftJISByteArray = await this.#s3Event.getCSVContents();
+      const { shiftJISByteArray, userId } = await this.#s3Event.getObjContent();
       const csvContents = new TextDecoder("shift-jis").decode(
         shiftJISByteArray
       );
-
-      // Extract the identityId from the S3 obuject key
-      const identityId = this.#s3Event.getIdentityId();
 
       const dataHandler = new HandleExpenseData(csvContents);
       const { jsonExpenseDataArray, expenseDate } = await dataHandler.extract();
@@ -61,7 +58,7 @@ class Handler {
       ).sumByCategory();
 
       // DynamoDBへの書き込み
-      await this.#dynamo.write(sumByCategory, expenseDate, identityId);
+      await this.#dynamo.write(sumByCategory, expenseDate, userId);
     } catch (error: unknown) {
       if (error instanceof Error) {
         logger.error(APPLICATION_ERROR_MESSAGE, error);

@@ -1,8 +1,11 @@
 import { Authenticator } from "@aws-amplify/ui-react";
 import { MantineProvider, createTheme } from "@mantine/core";
-import "@mantine/core/styles.css";
+import React from "react";
 import { ReactNode } from "react";
 import { BrowserRouter } from "react-router-dom";
+import "@mantine/core/styles.css";
+import "@mantine/charts/styles.css";
+import "@mantine/notifications/styles.css";
 
 type AppProviderProps = {
   children: ReactNode;

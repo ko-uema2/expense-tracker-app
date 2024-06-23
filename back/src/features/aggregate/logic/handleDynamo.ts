@@ -30,14 +30,14 @@ export class HandleDynamo {
   async write(
     sumByCategory: { [key: string]: number },
     expenseDate: string,
-    identityId: string
+    userId: string
   ) {
     // Write data to DynamoDB
     await this.#dynamoDBDocumentClient.send(
       new PutCommand({
         TableName: this.#tableName,
         Item: {
-          userId: identityId, // TODO: Replace with the actual user ID
+          userId,
           expenseDate: expenseDate,
           ...sumByCategory,
         },

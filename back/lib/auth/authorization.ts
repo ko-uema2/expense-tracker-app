@@ -78,8 +78,6 @@ export class Authorization extends Construct {
       actions: ["s3:PutObject"],
       resources: [
         bucketArn + "/private/${cognito-identity.amazonaws.com:sub}/*",
-        // bucketArn + "/private/*",
-        // bucketArn + "/*",
       ],
     });
 

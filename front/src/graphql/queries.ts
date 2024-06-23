@@ -8,9 +8,8 @@ type GeneratedQuery<InputType, OutputType> = string & {
   __generatedQueryOutput: OutputType;
 };
 
-export const getExpData = /* GraphQL */ `query GetExpData($userId: String) {
+export const getExpData = /* GraphQL */ `query GetExpData($userId: String!) {
   getExpData(userId: $userId) {
-    id
     userId
     expenseDate
     regFixedCost

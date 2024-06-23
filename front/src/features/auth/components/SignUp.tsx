@@ -9,8 +9,8 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { signUp } from "aws-amplify/auth";
 import { FC, FormEvent, memo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { set } from "zod";
 
 export const SignUp: FC = memo(() => {
   const nav = useNavigate();
@@ -116,3 +116,5 @@ export const SignUp: FC = memo(() => {
     </div>
   );
 });
+
+SignUp.displayName = "SignUp";
