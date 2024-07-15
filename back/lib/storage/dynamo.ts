@@ -2,9 +2,20 @@ import * as cdk from "aws-cdk-lib";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 
+/**
+ * Represents a DynamoDB table for expense data.
+ */
 export class DynamoDB extends Construct {
+  /**
+   * The DynamoDB table for storing expense data.
+   */
   readonly table: dynamodb.TableV2;
 
+  /**
+   * Constructs a new instance of the DynamoDB class.
+   * @param scope The parent construct.
+   * @param id  The construct ID.
+   */
   constructor(scope: Construct, id: string) {
     super(scope, id);
 

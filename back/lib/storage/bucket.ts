@@ -3,9 +3,20 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 
+/**
+ * Represents an S3 bucket for storing expense data.
+ */
 export class S3Bucket extends Construct {
+  /**
+   * The S3 bucket for storing expense data.
+   */
   readonly bucket: s3.Bucket;
 
+  /**
+   * Constructs a new instance of the S3Bucket class.
+   * @param scope The parent construct.
+   * @param id The construct ID.
+   */
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
