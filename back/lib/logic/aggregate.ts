@@ -4,9 +4,17 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import path = require("path");
 
+/**
+ * Represents a Lambda construct.
+ */
 export class Lambda extends Construct {
   readonly lambda: cdk.aws_lambda_nodejs.NodejsFunction;
 
+  /**
+   * Constructs a new instance of the Lambda class.
+   * @param scope The parent construct.
+   * @param id The logical ID of the construct.
+   */
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
@@ -66,6 +74,9 @@ export class Lambda extends Construct {
           cdk.Fn.sub(
             "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ExpenseDataTable"
           ),
+          // `arn:aws:dynamodb:${cdk.Stack.of(this).region}:${
+          //   cdk.Stack.of(this).account
+          // }:table/ExpenseDataTable`,
         ],
       })
     );
