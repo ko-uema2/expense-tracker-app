@@ -12,26 +12,43 @@ export class PipelineStack extends cdk.Stack {
     // Create a s3 bucket for the pipeline artifacts
     const sourceOutput = new codepipeline.Artifact("deployPipelineArtifact");
 
+    // Create a CodeStar Connections source action
+    const sourceAction =
+      new codepipeline_actions.CodeStarConnectionsSourceAction({
+        actionName: "GitHub",
+        connectionArn: `arn:aws:codestar-connections:${this.region}:${this.account}:connection/67cadc11-2872-4611-9179-0a4d0b43e6ff`,
+        owner: "ko-uema2",
+        repo: "expense-tracker-app",
+        branch: "main",
+        output: sourceOutput,
+      });
+
     // Create a pipeline for the ExpenseTracker application deployment
     const deployPipeline = new codepipeline.Pipeline(this, id, {
       pipelineName: "ExpenseTrackerDeployPipeline",
       pipelineType: codepipeline.PipelineType.V2,
       crossAccountKeys: false,
+      triggers: [
+        {
+          providerType: codepipeline.ProviderType.CODE_STAR_SOURCE_CONNECTION,
+          gitConfiguration: {
+            sourceAction,
+            pullRequestFilter: [
+              {
+                branchesIncludes: ["main"],
+                filePathsIncludes: ["back/*"],
+                events: [codepipeline.GitPullRequestEvent.CLOSED],
+              },
+            ],
+          },
+        },
+      ],
     });
 
     // Source stage: Get the application code from GitHub
     const sourceStage = deployPipeline.addStage({
       stageName: "Source",
-      actions: [
-        new codepipeline_actions.CodeStarConnectionsSourceAction({
-          actionName: "GitHub",
-          connectionArn: `arn:aws:codestar-connections:${this.region}:${this.account}:connection/67cadc11-2872-4611-9179-0a4d0b43e6ff`,
-          owner: "ko-uema2",
-          repo: "expense-tracker-app",
-          branch: "main",
-          output: sourceOutput,
-        }),
-      ],
+      actions: [sourceAction],
     });
 
     // Create a CodeBuild project to deploy the application using CDK
