@@ -18,9 +18,9 @@ export class BackStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const aggregate = new Lambda(this, "Aggregate");
-
     const expenseDataBucket = new S3Bucket(this, "ExpenseDataBucket");
+
+    const aggregate = new Lambda(this, "Aggregate", expenseDataBucket.bucket);
 
     // Add event notification to the expense data bucket
     expenseDataBucket.bucket.addEventNotification(

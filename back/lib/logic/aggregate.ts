@@ -1,5 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as s3 from "aws-cdk-lib/aws-s3";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import path = require("path");
@@ -15,7 +16,7 @@ export class Lambda extends Construct {
    * @param scope The parent construct.
    * @param id The logical ID of the construct.
    */
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, s3EventSource: s3.Bucket) {
     super(scope, id);
 
     // Create the IAM role for the aggregate lambda function
@@ -30,12 +31,20 @@ export class Lambda extends Construct {
           iam.ManagedPolicy.fromAwsManagedPolicyName(
             "CloudWatchLogsFullAccess"
           ),
-          iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonS3ReadOnlyAccess"),
-          iam.ManagedPolicy.fromAwsManagedPolicyName(
-            "AWSXrayDaemonWriteAccess"
-          ),
         ],
       }
+    );
+
+    // Add necessary permissions to the aggregate lambda function execution role
+    aggregateLambdaExecutionRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["s3:GetObject", "s3:listObject"],
+        resources: [
+          `${s3EventSource.bucketArn}`,
+          `${s3EventSource.bucketArn}/*`,
+        ],
+      })
     );
 
     // Create the aggregate lambda function
@@ -47,11 +56,9 @@ export class Lambda extends Construct {
         entry: path.join(__dirname, "../../src/features/aggregate/lambda.ts"),
         role: aggregateLambdaExecutionRole,
         environment: {
-          POWERTOOLS_SERVICE_NAME: "ExpenseTrackerApp",
           CATEGORY_LIST: "ExpenseTrackerApp-categoryList",
           DYNAMO_DB_TABLE_NAME: "ExpenseDataTable",
         },
-        tracing: lambda.Tracing.ACTIVE,
         loggingFormat: lambda.LoggingFormat.JSON,
         applicationLogLevel: lambda.ApplicationLogLevel.INFO,
         systemLogLevel: lambda.SystemLogLevel.INFO,
@@ -71,12 +78,9 @@ export class Lambda extends Construct {
           "dynamodb:DeleteItem",
         ],
         resources: [
-          cdk.Fn.sub(
-            "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ExpenseDataTable"
-          ),
-          // `arn:aws:dynamodb:${cdk.Stack.of(this).region}:${
-          //   cdk.Stack.of(this).account
-          // }:table/ExpenseDataTable`,
+          `arn:aws:dynamodb:${cdk.Stack.of(this).region}:${
+            cdk.Stack.of(this).account
+          }:table/ExpenseDataTable`,
         ],
       })
     );
