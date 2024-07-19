@@ -60,6 +60,19 @@ export class Lambda extends Construct {
       })
     );
 
+    // Add necessary permissions to the aggregate lambda function execution role
+    aggregateLambdaExecutionRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["ssm:GetParameter"],
+        resources: [
+          `arn:aws:ssm:${cdk.Stack.of(this).region}:${
+            cdk.Stack.of(this).account
+          }:parameter/ExpenseTrackerApp-categoryList`,
+        ],
+      })
+    );
+
     // Create the aggregate lambda function
     this.lambda = new cdk.aws_lambda_nodejs.NodejsFunction(
       this,
