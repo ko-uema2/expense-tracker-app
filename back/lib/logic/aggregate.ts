@@ -39,7 +39,7 @@ export class Lambda extends Construct {
     aggregateLambdaExecutionRole.addToPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ["s3:GetObject", "s3:listObject"],
+        actions: ["s3:GetObject", "s3:ListObject"],
         resources: [
           `${s3EventSource.bucketArn}`,
           `${s3EventSource.bucketArn}/*`,
