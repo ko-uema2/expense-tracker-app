@@ -1,5 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import { LogGroup } from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
@@ -19,19 +20,18 @@ export class Lambda extends Construct {
   constructor(scope: Construct, id: string, s3EventSource: s3.Bucket) {
     super(scope, id);
 
-    // Create the IAM role for the aggregate lambda function
+    // Create a log group for the aggregate lambda function
+    const logGroup = new LogGroup(this, "AggregateLambdaLogGroup", {
+      logGroupName: `/aws/lambda/${id}`,
+    });
+
+    // Create a IAM role for the aggregate lambda function
     const aggregateLambdaExecutionRole = new iam.Role(
       this,
       "AggregateLambdaExecutionRole",
       {
         roleName: "AggregateLambdaExecutionRole",
         assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
-        managedPolicies: [
-          iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMReadOnlyAccess"),
-          iam.ManagedPolicy.fromAwsManagedPolicyName(
-            "CloudWatchLogsFullAccess"
-          ),
-        ],
       }
     );
 
@@ -39,10 +39,36 @@ export class Lambda extends Construct {
     aggregateLambdaExecutionRole.addToPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ["s3:GetObject", "s3:listObject"],
+        actions: [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ],
+        resources: [logGroup.logGroupArn],
+      })
+    );
+
+    // Add necessary permissions to the aggregate lambda function execution role
+    aggregateLambdaExecutionRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["s3:GetObject", "s3:ListBucket"],
         resources: [
           `${s3EventSource.bucketArn}`,
           `${s3EventSource.bucketArn}/*`,
+        ],
+      })
+    );
+
+    // Add necessary permissions to the aggregate lambda function execution role
+    aggregateLambdaExecutionRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["ssm:GetParameter"],
+        resources: [
+          `arn:aws:ssm:${cdk.Stack.of(this).region}:${
+            cdk.Stack.of(this).account
+          }:parameter/ExpenseTrackerApp-categoryList`,
         ],
       })
     );
@@ -61,6 +87,7 @@ export class Lambda extends Construct {
         },
         loggingFormat: lambda.LoggingFormat.JSON,
         applicationLogLevel: lambda.ApplicationLogLevel.INFO,
+        logGroup: logGroup,
         systemLogLevel: lambda.SystemLogLevel.INFO,
         timeout: cdk.Duration.seconds(10),
       }

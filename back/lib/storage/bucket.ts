@@ -31,8 +31,8 @@ export class S3Bucket extends Construct {
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       serverAccessLogsBucket: accessLogsBucket,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
-      publicReadAccess: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      publicReadAccess: false,
       cors: [
         {
           allowedHeaders: ["*"],
