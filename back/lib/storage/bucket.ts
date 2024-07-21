@@ -59,51 +59,49 @@ export class S3Bucket extends Construct {
       ],
     });
 
-    // Define the bucket policy to allow PutObject action for CSV files only
-    const AllowCSVUploadOnlyPolicy = new iam.PolicyStatement({
-      effect: iam.Effect.DENY,
-      principals: [new iam.AnyPrincipal()],
-      actions: ["s3:PutObject"],
-      notResources: [
-        `${this.bucket.bucketArn}/*/*.csv`,
-        `${this.bucket.bucketArn}/*/`,
-      ],
-    });
-
-    // Define the bucket policy to allow only encrypted connections over HTTPS
-    const EnforceHttpsOnlyPolicy = new iam.PolicyStatement({
-      effect: iam.Effect.DENY,
-      actions: ["s3:*"],
-      resources: [`${this.bucket.bucketArn}`, `${this.bucket.bucketArn}/*`],
-      principals: [new iam.AnyPrincipal()],
-      conditions: {
-        Bool: {
-          "aws:SecureTransport": "false",
+    // Add the bucket policy to allow PutObject action for CSV files only
+    this.bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        principals: [new iam.AnyPrincipal()],
+        actions: ["s3:PutObject"],
+        notResources: [
+          `${this.bucket.bucketArn}/*/*.csv`,
+          `${this.bucket.bucketArn}/*/`,
+        ],
+      })
+    );
+    // Add the bucket policy to enforce HTTPS only for the expense data bucket
+    this.bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        actions: ["s3:*"],
+        resources: [`${this.bucket.bucketArn}`, `${this.bucket.bucketArn}/*`],
+        principals: [new iam.AnyPrincipal()],
+        conditions: {
+          Bool: {
+            "aws:SecureTransport": "false",
+          },
         },
-      },
-    });
+      })
+    );
 
-    const EnforceHttpsOnlyPolicyForAccessLogBucket = new iam.PolicyStatement({
-      effect: iam.Effect.DENY,
-      actions: ["s3:*"],
-      resources: [
-        `${accessLogsBucket.bucketArn}`,
-        `${accessLogsBucket.bucketArn}/*`,
-      ],
-      principals: [new iam.AnyPrincipal()],
-      conditions: {
-        Bool: {
-          "aws:SecureTransport": "false",
-        },
-      },
-    });
-
-    // Add the bucket policy to the expense data bucket
-    this.bucket.addToResourcePolicy(AllowCSVUploadOnlyPolicy);
-    this.bucket.addToResourcePolicy(EnforceHttpsOnlyPolicy);
-
+    // Add the bucket policy to enforce HTTPS only for the access logs bucket
     accessLogsBucket.addToResourcePolicy(
-      EnforceHttpsOnlyPolicyForAccessLogBucket
+      new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        actions: ["s3:*"],
+        resources: [
+          `${accessLogsBucket.bucketArn}`,
+          `${accessLogsBucket.bucketArn}/*`,
+        ],
+        principals: [new iam.AnyPrincipal()],
+        conditions: {
+          Bool: {
+            "aws:SecureTransport": "false",
+          },
+        },
+      })
     );
   }
 }
