@@ -26,6 +26,16 @@ export class S3Bucket extends Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // Create the IAM role for the notification handler
+    const notificationHandlerRole = new iam.Role(
+      this,
+      `${id}-NotificationHandlerRole`,
+      {
+        assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+        roleName: `${id}-NotificationHandlerRole`,
+      }
+    );
+
     // Create the S3 bucket for expense data
     this.bucket = new s3.Bucket(this, id, {
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -33,6 +43,7 @@ export class S3Bucket extends Construct {
       serverAccessLogsBucket: accessLogsBucket,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       publicReadAccess: false,
+      notificationsHandlerRole: notificationHandlerRole,
       cors: [
         {
           allowedHeaders: ["*"],
