@@ -26,6 +26,16 @@ export class S3Bucket extends Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // Create the IAM role for the notification handler
+    const notificationHandlerRole = new iam.Role(
+      this,
+      `${id}-NotificationHandlerRole`,
+      {
+        assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+        roleName: `${id}-NotificationHandlerRole`,
+      }
+    );
+
     // Create the S3 bucket for expense data
     this.bucket = new s3.Bucket(this, id, {
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -33,6 +43,7 @@ export class S3Bucket extends Construct {
       serverAccessLogsBucket: accessLogsBucket,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       publicReadAccess: false,
+      notificationsHandlerRole: notificationHandlerRole,
       cors: [
         {
           allowedHeaders: ["*"],
@@ -48,51 +59,49 @@ export class S3Bucket extends Construct {
       ],
     });
 
-    // Define the bucket policy to allow PutObject action for CSV files only
-    const AllowCSVUploadOnlyPolicy = new iam.PolicyStatement({
-      effect: iam.Effect.DENY,
-      principals: [new iam.AnyPrincipal()],
-      actions: ["s3:PutObject"],
-      notResources: [
-        `${this.bucket.bucketArn}/*/*.csv`,
-        `${this.bucket.bucketArn}/*/`,
-      ],
-    });
-
-    // Define the bucket policy to allow only encrypted connections over HTTPS
-    const EnforceHttpsOnlyPolicy = new iam.PolicyStatement({
-      effect: iam.Effect.DENY,
-      actions: ["s3:*"],
-      resources: [`${this.bucket.bucketArn}`, `${this.bucket.bucketArn}/*`],
-      principals: [new iam.AnyPrincipal()],
-      conditions: {
-        Bool: {
-          "aws:SecureTransport": "false",
+    // Add the bucket policy to allow PutObject action for CSV files only
+    this.bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        principals: [new iam.AnyPrincipal()],
+        actions: ["s3:PutObject"],
+        notResources: [
+          `${this.bucket.bucketArn}/*/*.csv`,
+          `${this.bucket.bucketArn}/*/`,
+        ],
+      })
+    );
+    // Add the bucket policy to enforce HTTPS only for the expense data bucket
+    this.bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        actions: ["s3:*"],
+        resources: [`${this.bucket.bucketArn}`, `${this.bucket.bucketArn}/*`],
+        principals: [new iam.AnyPrincipal()],
+        conditions: {
+          Bool: {
+            "aws:SecureTransport": "false",
+          },
         },
-      },
-    });
+      })
+    );
 
-    const EnforceHttpsOnlyPolicyForAccessLogBucket = new iam.PolicyStatement({
-      effect: iam.Effect.DENY,
-      actions: ["s3:*"],
-      resources: [
-        `${accessLogsBucket.bucketArn}`,
-        `${accessLogsBucket.bucketArn}/*`,
-      ],
-      principals: [new iam.AnyPrincipal()],
-      conditions: {
-        Bool: {
-          "aws:SecureTransport": "false",
-        },
-      },
-    });
-
-    // Add the bucket policy to the expense data bucket
-    this.bucket.addToResourcePolicy(AllowCSVUploadOnlyPolicy);
-    this.bucket.addToResourcePolicy(EnforceHttpsOnlyPolicy);
-
+    // Add the bucket policy to enforce HTTPS only for the access logs bucket
     accessLogsBucket.addToResourcePolicy(
-      EnforceHttpsOnlyPolicyForAccessLogBucket
+      new iam.PolicyStatement({
+        effect: iam.Effect.DENY,
+        actions: ["s3:*"],
+        resources: [
+          `${accessLogsBucket.bucketArn}`,
+          `${accessLogsBucket.bucketArn}/*`,
+        ],
+        principals: [new iam.AnyPrincipal()],
+        conditions: {
+          Bool: {
+            "aws:SecureTransport": "false",
+          },
+        },
+      })
     );
   }
 }

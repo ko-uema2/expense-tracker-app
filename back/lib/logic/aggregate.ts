@@ -1,6 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import { LogGroup } from "aws-cdk-lib/aws-logs";
+import * as logs from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
@@ -21,8 +21,9 @@ export class Lambda extends Construct {
     super(scope, id);
 
     // Create a log group for the aggregate lambda function
-    const logGroup = new LogGroup(this, "AggregateLambdaLogGroup", {
+    const logGroup = new logs.LogGroup(this, "AggregateLambdaLogGroup", {
       logGroupName: `/aws/lambda/${id}`,
+      retention: logs.RetentionDays.THREE_MONTHS,
     });
 
     // Create a IAM role for the aggregate lambda function
@@ -73,28 +74,8 @@ export class Lambda extends Construct {
       })
     );
 
-    // Create the aggregate lambda function
-    this.lambda = new cdk.aws_lambda_nodejs.NodejsFunction(
-      this,
-      "AggregateLambda",
-      {
-        runtime: lambda.Runtime.NODEJS_20_X,
-        entry: path.join(__dirname, "../../src/features/aggregate/lambda.ts"),
-        role: aggregateLambdaExecutionRole,
-        environment: {
-          CATEGORY_LIST: "ExpenseTrackerApp-categoryList",
-          DYNAMO_DB_TABLE_NAME: "ExpenseDataTable",
-        },
-        loggingFormat: lambda.LoggingFormat.JSON,
-        applicationLogLevel: lambda.ApplicationLogLevel.INFO,
-        logGroup: logGroup,
-        systemLogLevel: lambda.SystemLogLevel.INFO,
-        timeout: cdk.Duration.seconds(10),
-      }
-    );
-
-    // Add necessary permissions to the aggregate lambda function
-    this.lambda.addToRolePolicy(
+    // Add necessary permissions to the aggregate lambda function execution role
+    aggregateLambdaExecutionRole.addToPolicy(
       new iam.PolicyStatement({
         actions: [
           "dynamodb:Query",
@@ -111,5 +92,21 @@ export class Lambda extends Construct {
         ],
       })
     );
+
+    // Create the aggregate lambda function
+    this.lambda = new cdk.aws_lambda_nodejs.NodejsFunction(this, id, {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: path.join(__dirname, "../../src/features/aggregate/lambda.ts"),
+      role: aggregateLambdaExecutionRole,
+      environment: {
+        CATEGORY_LIST: "ExpenseTrackerApp-categoryList",
+        DYNAMO_DB_TABLE_NAME: "ExpenseDataTable",
+      },
+      logGroup: logGroup,
+      loggingFormat: lambda.LoggingFormat.JSON,
+      applicationLogLevel: lambda.ApplicationLogLevel.INFO,
+      systemLogLevel: lambda.SystemLogLevel.INFO,
+      timeout: cdk.Duration.seconds(10),
+    });
   }
 }
