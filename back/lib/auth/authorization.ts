@@ -86,13 +86,22 @@ export class Authorization extends Construct {
       statements: [appSyncInvokePolicy, s3UploadPolicy],
     });
 
+    const unauthenticatedPolicy = new iam.Policy(
+      this,
+      "UnauthenticatedPolicy",
+      {
+        policyName: "UnauthenticatedPolicy",
+        statements: [appSyncInvokePolicy],
+      }
+    );
+
     expenseTrackerIDPool.authenticatedRole.attachInlinePolicy(
       authenticatedPolicy
     );
 
     // create a role for unauthenticated users
-    expenseTrackerIDPool.unauthenticatedRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName("AWSAppSyncInvokeFullAccess")
+    expenseTrackerIDPool.unauthenticatedRole.attachInlinePolicy(
+      unauthenticatedPolicy
     );
 
     // create a group for authenticated users
