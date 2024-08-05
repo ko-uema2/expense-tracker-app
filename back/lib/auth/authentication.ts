@@ -50,6 +50,7 @@ export class Authentication extends Construct {
         tempPasswordValidity: cdk.Duration.days(7),
       },
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      advancedSecurityMode: cognito.AdvancedSecurityMode.ENFORCED,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }

@@ -6,6 +6,7 @@ import { Authentication, Authorization } from "./auth";
 import { Lambda } from "./logic";
 import { AppSync } from "./gateway";
 import { DynamoDB, S3Bucket } from "./storage";
+import { NagSuppressions } from "cdk-nag";
 
 export class BackStack extends cdk.Stack {
   /**
@@ -65,6 +66,125 @@ export class BackStack extends cdk.Stack {
         bucketArn: expenseDataBucket.bucket.bucketArn,
         appsyncArn: expenseTracker.api.arn,
       }
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/Aggregate/AggregateLambdaExecutionRole/DefaultPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "To allow the Lambda function to access any object within the bucket.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/ExpenseDataBucket/ExpenseDataBucket-NotificationHandlerRole/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM4",
+          reason:
+            "To allow the AWSLambdaBasicExecutionRole to be used because that role is granted automatically.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/ExpenseDataBucket/ExpenseDataBucket-NotificationHandlerRole/DefaultPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "Because we cannot specify the log group ARN in the IAM policy, as we are unable to identity the log gruup ARN.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/ExpenseTrackerAPI/appsyncRole/DefaultPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "Because we cannot specify the log group ARN in the IAM policy, as we are unable to identity the log group ARN.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/ExpenseTrackerAPI/ExpenseTrackerAPI/ExpenseDataSource/ServiceRole/DefaultPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "Because it is necessary to allow DynamoDB actions on the entire local secondary index.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM4",
+          reason:
+            "To allow the AWSLambdaBasicExecutionRole to be used because that role is granted automatically.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "Because we cannot identify the relevant IAM role and cannnot overwite the default policy.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/Authorization/ExpenseTrackerIDPool/Resource",
+      [
+        {
+          id: "AwsSolutions-COG7",
+          reason: "To implement the guest login feature in the application.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/Authorization/AuthenticatedPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "To grant permissions for all operations within the specified AppSync API.",
+        },
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      "/ExpenseTrackerBackendStack/Authorization/UnauthenticatedPolicy/Resource",
+      [
+        {
+          id: "AwsSolutions-IAM5",
+          reason:
+            "To grant permissions for all operations within the specified AppSync API.",
+        },
+      ]
     );
   }
 }
