@@ -1,3 +1,4 @@
+import React from "react";
 import { AppProvider } from "@/providers/AppProvider";
 import { AppRoutes } from "@/routes";
 import { Amplify } from "aws-amplify";

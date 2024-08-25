@@ -81,9 +81,21 @@ export class Authorization extends Construct {
       ],
     });
 
+    const applicationLogPolicy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:CreateLogGroup",
+        "logs:PutLogEvents",
+      ],
+      resources: ["*"],
+    });
+
     const authenticatedPolicy = new iam.Policy(this, "AuthenticatedPolicy", {
       policyName: "AuthenticatedPolicy",
-      statements: [appSyncInvokePolicy, s3UploadPolicy],
+      statements: [appSyncInvokePolicy, s3UploadPolicy, applicationLogPolicy],
     });
 
     const unauthenticatedPolicy = new iam.Policy(
@@ -91,7 +103,7 @@ export class Authorization extends Construct {
       "UnauthenticatedPolicy",
       {
         policyName: "UnauthenticatedPolicy",
-        statements: [appSyncInvokePolicy],
+        statements: [appSyncInvokePolicy, applicationLogPolicy],
       }
     );
 
