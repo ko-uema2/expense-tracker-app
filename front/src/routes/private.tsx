@@ -93,9 +93,11 @@ export const privateRoutes: RouteObject[] = [
   {
     path: "/app",
     element: (
+      <ErrorBoundary FallbackComponent={Error500WithinPrivateRoute}>
       <PrivateRoute>
         <App />
       </PrivateRoute>
+      </ErrorBoundary>
     ),
   },
 ];
