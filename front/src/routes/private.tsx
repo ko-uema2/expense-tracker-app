@@ -1,6 +1,8 @@
 import { Loading } from "@/components/form";
 import { SignOut } from "@/features/auth/components/SignOut";
 import { Financial } from "@/features/financial";
+import { Header } from "@/components/layouts";
+import { Menu } from "@/features/menu/components/Menu";
 import { useAuthToken } from "@/hooks/useAuthToken";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import {
@@ -29,16 +31,8 @@ const App: FC = memo(() => {
         collapsed: { mobile: !opened },
       }}
     >
-      <AppShell.Header className="border-b border-base-300">
-        <Group className="h-full px-2 justify-between">
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Title className="text-primary-700" order={2}>
-            Expense Tracker
-          </Title>
-          <Code className="mr-2" fw={700}>
-            v1.0.0
-          </Code>
-        </Group>
+      <AppShell.Header className="bg-base-50">
+        <Header opened={opened} toggle={toggle} />
       </AppShell.Header>
       <AppShell.Navbar className="p-4 border-r border-base-300">
         <AppShell.Section>
