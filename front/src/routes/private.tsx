@@ -1,21 +1,15 @@
+import { Error500WithinPrivateRoute } from "@/components/error";
 import { Loading } from "@/components/form";
-import { SignOut } from "@/features/auth/components/SignOut";
 import { Financial } from "@/features/financial";
 import { Header } from "@/components/layouts";
 import { Menu } from "@/features/menu/components/Menu";
 import { useAuthToken } from "@/hooks/useAuthToken";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import {
-  AppShell,
-  Burger,
-  Code,
-  Group,
-  ScrollArea,
-  Title,
-} from "@mantine/core";
+import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, ReactNode, Suspense, memo } from "react";
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { Navigate, RouteObject } from "react-router-dom";
 
 const App: FC = memo(() => {
@@ -26,32 +20,22 @@ const App: FC = memo(() => {
       className="p-4"
       header={{ height: 60 }}
       navbar={{
-        width: { base: 150, md: 150, lg: 200 },
+        width: { base: 200 },
         breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}
+      withBorder={false}
+      padding={{ base: 5 }}
     >
       <AppShell.Header className="bg-base-50">
         <Header opened={opened} toggle={toggle} />
       </AppShell.Header>
-      <AppShell.Navbar className="p-4 border-r border-base-300">
+      <AppShell.Navbar className="p-4 bg-base-50">
         <AppShell.Section>
-          <Group className="justify-between h-10">
-            <Title className="ml-2 text-base-700 text-lg">Menu</Title>
-          </Group>
-        </AppShell.Section>
-        <AppShell.Section
-          className="my-4"
-          grow
-          component={ScrollArea}
-        ></AppShell.Section>
-        <AppShell.Section>
-          <div className="pt-3 border-t border-base-300">
-            <SignOut />
-          </div>
+          <Menu />
         </AppShell.Section>
       </AppShell.Navbar>
-      <AppShell.Main>
+      <AppShell.Main className="">
         <Suspense fallback={<div>Loading...</div>}>
           <Financial />
         </Suspense>
@@ -94,9 +78,9 @@ export const privateRoutes: RouteObject[] = [
     path: "/app",
     element: (
       <ErrorBoundary FallbackComponent={Error500WithinPrivateRoute}>
-      <PrivateRoute>
-        <App />
-      </PrivateRoute>
+        <PrivateRoute>
+          <App />
+        </PrivateRoute>
       </ErrorBoundary>
     ),
   },

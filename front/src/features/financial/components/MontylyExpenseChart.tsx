@@ -24,7 +24,7 @@ export const MonthlyExpenseChart: FC = memo(() => {
         <Grid>
           <Grid.Col span={12}>
             <LineChart
-              className="p-5 border-2 rounded-lg border-base-300"
+              className="px-4"
               h={300}
               data={chartData}
               unit="円"
@@ -42,7 +42,7 @@ export const MonthlyExpenseChart: FC = memo(() => {
           </Grid.Col>
           <Grid.Col span={12}>
             <LineChart
-              className="p-5 border-2 rounded-lg border-base-300"
+              className="px-4"
               h={300}
               data={chartData}
               unit="円"
@@ -62,7 +62,7 @@ export const MonthlyExpenseChart: FC = memo(() => {
         <Grid>
           <Grid.Col span={12}>
             <LineChart
-              className="p-5 border-2 rounded-lg border-base-300"
+              className="px-4"
               h={300}
               data={chartData}
               unit="円"
@@ -80,7 +80,7 @@ export const MonthlyExpenseChart: FC = memo(() => {
           </Grid.Col>
           <Grid.Col span={12}>
             <LineChart
-              className="p-5 border-2 rounded-lg border-base-300"
+              className="px-4"
               h={300}
               data={chartData}
               unit="円"
