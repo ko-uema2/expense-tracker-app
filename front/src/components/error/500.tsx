@@ -1,7 +1,6 @@
 import { Container, Image, SimpleGrid, Text, Title } from "@mantine/core";
 import { FC, memo } from "react";
 import image from "@/assets/undraw_server_down_s-4-lk.svg";
-import React from "react";
 import { Done } from "@/components/button";
 
 export const Error500WithinPrivateRoute: FC = memo(() => {
