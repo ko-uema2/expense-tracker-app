@@ -3,7 +3,6 @@ import { useExpData } from "@/features/financial/hooks/useExpData";
 import { LineChart } from "@mantine/charts";
 import { Grid, SimpleGrid } from "@mantine/core";
 import { FC, memo } from "react";
-import React from "react";
 
 export const MonthlyExpenseChart: FC = memo(() => {
   const { data, error } = useExpData();

@@ -4,7 +4,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { uploadData, UploadDataWithPathOutput } from "aws-amplify/storage";
 import { LuFilePlus2 } from "react-icons/lu";
 import { FC, RefObject, memo, useRef, useState } from "react";
-import React from "react";
+import * as Encoding from "encoding-japanese";
 
 type UploadButtonProps = {
   openRef: RefObject<() => void>;

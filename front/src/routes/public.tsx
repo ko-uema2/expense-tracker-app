@@ -1,4 +1,3 @@
-import React from "react";
 import { AuthRoutes } from "@/features/auth/routes";
 import { ErrorBoundary } from "react-error-boundary";
 import { Error500WithinPubliceRoute } from "@/components/error";

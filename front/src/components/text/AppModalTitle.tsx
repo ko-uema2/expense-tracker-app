@@ -1,5 +1,4 @@
 import { FC, memo } from "react";
-import React from "react";
 
 import { Text } from "@mantine/core";
 

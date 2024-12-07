@@ -8,7 +8,6 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, ReactNode, Suspense, memo } from "react";
-import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Navigate, RouteObject } from "react-router-dom";
 

@@ -1,5 +1,4 @@
 import { FC, memo } from "react";
-import React from "react";
 
 import { TextInput } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";

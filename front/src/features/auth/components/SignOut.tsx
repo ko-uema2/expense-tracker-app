@@ -1,7 +1,6 @@
 import { Text, UnstyledButton } from "@mantine/core";
 import { signOut } from "aws-amplify/auth";
 import { FC, memo } from "react";
-import React from "react";
 import { BsBoxArrowLeft } from "react-icons/bs";
 
 export const SignOut: FC = memo(() => {

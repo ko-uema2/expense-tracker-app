@@ -1,5 +1,4 @@
 import { FC, memo } from "react";
-import React from "react";
 
 import { Button, DefaultMantineColor } from "@mantine/core";
 

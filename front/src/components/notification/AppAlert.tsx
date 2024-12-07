@@ -1,5 +1,4 @@
 import { FC, ReactNode, memo } from "react";
-import React from "react";
 
 import { Alert } from "@mantine/core";
 import { SlExclamation } from "react-icons/sl";

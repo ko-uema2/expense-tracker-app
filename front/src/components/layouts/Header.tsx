@@ -1,7 +1,6 @@
 import { ActionIcon, Burger, Group, Menu, Title } from "@mantine/core";
 import { signOut } from "aws-amplify/auth";
 import { FC, memo } from "react";
-import React from "react";
 import { BsBoxArrowLeft } from "react-icons/bs";
 import { LuSettings, LuSettings2 } from "react-icons/lu";
 
