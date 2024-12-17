@@ -9,7 +9,8 @@
 export default {
   preset: "ts-jest",
   testEnvironment: "jest-environment-jsdom",
-  collectCoverage: true,
+  collectCoverage: false,
+  coverageProvider: "v8",
   coverageDirectory: "./coverage",
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
