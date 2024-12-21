@@ -9,11 +9,11 @@ import { Navigate, useRoutes } from "react-router-dom";
  * @returns The rendered routes.
  */
 export const AppRoutes = () => {
-  const element = useRoutes([
-    ...publicRoutes,
-    ...privateRoutes,
-    { path: "*", element: <Navigate to="/auth/signin" replace /> },
-  ]);
+	const element = useRoutes([
+		...publicRoutes,
+		...privateRoutes,
+		{ path: "*", element: <Navigate to="/auth/signin" replace /> },
+	]);
 
-  return <>{element}</>;
+	return <>{element}</>;
 };
