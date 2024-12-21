@@ -7,10 +7,10 @@ import { Route, Routes } from "react-router-dom";
  * @returns The authentication routes.
  */
 export const AuthRoutes = () => {
-  return (
-    <Routes>
-      <Route path="signup" element={<SignUp />} />
-      <Route path="signin" element={<SignIn />} />
-    </Routes>
-  );
+	return (
+		<Routes>
+			<Route path="signup" element={<SignUp />} />
+			<Route path="signin" element={<SignIn />} />
+		</Routes>
+	);
 };
