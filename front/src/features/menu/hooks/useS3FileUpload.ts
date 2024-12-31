@@ -1,37 +1,12 @@
 import { FileUploadException } from "@/features/menu/error";
 import { StorageError } from "@/features/menu/error";
-import { type AppError, NoError, UnknownError } from "@/utils/error";
+import type { Action, States } from "@/features/menu/hooks/type";
+import { NoError, UnknownError } from "@/utils/error";
 import type { FileWithPath } from "@mantine/dropzone";
 import { fetchAuthSession } from "aws-amplify/auth";
 import { uploadData } from "aws-amplify/storage";
 import * as Encoding from "encoding-japanese";
 import { useReducer } from "react";
-
-// Define the shape of the state object
-type FileState = {
-	isLoading: boolean;
-	isSuccessful: boolean;
-	error: AppError;
-};
-
-type States = {
-	files: Record<string, FileState>;
-};
-
-// Define the shape of the action object
-type Action =
-	| {
-			type: "FILE_UPLOAD_START";
-			payload: string;
-	  }
-	| {
-			type: "FILE_UPLOAD_SUCCESS";
-			payload: string;
-	  }
-	| {
-			type: "FILE_UPLOAD_FAILURE";
-			payload: { fileName: string; error: AppError };
-	  };
 
 // Define the initial state
 const initialState: States = {
@@ -41,6 +16,10 @@ const initialState: States = {
 // Define the reducer function
 const reducer = (state: States, action: Action): States => {
 	switch (action.type) {
+		case "FILE_UPLOAD_INIT":
+			return {
+				...initialState,
+			};
 		case "FILE_UPLOAD_START":
 			return {
 				...state,
@@ -97,6 +76,7 @@ export const useS3FileUpload = () => {
 	 * @returns {Promise<void>} A Promise that resolves when the upload is complete, or rejects with an error if the upload fails.
 	 */
 	const upload = async (files: FileWithPath[]): Promise<void> => {
+		dispatch({ type: "FILE_UPLOAD_INIT" });
 		// Fetch the current user's session
 		const session = await fetchAuthSession();
 		if (!session || !session.identityId || !session.userSub) {
