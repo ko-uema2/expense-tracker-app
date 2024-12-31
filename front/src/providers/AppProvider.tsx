@@ -1,5 +1,6 @@
 import { Authenticator } from "@aws-amplify/ui-react";
 import { MantineProvider, createTheme } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { type ReactNode, memo } from "react";
 import { BrowserRouter } from "react-router-dom";
 import "@mantine/core/styles.css";
@@ -75,6 +76,7 @@ const theme = createTheme({
 export const AppProvider = memo(({ children }: AppProviderProps) => {
 	return (
 		<MantineProvider defaultColorScheme="light" theme={theme}>
+			<Notifications />
 			<Authenticator.Provider>
 				<BrowserRouter>{children}</BrowserRouter>
 			</Authenticator.Provider>
