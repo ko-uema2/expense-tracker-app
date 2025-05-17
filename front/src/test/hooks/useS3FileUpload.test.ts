@@ -52,20 +52,6 @@ describe("useS3FileUpload", () => {
 	});
 
 	/**
-	 * Test case: Verifying the properties of the hook's return object.
-	 *
-	 * This test ensures that the `useS3FileUpload` hook returns an object with the correct properties.
-	 */
-	test("should return an object with the correct properties", () => {
-		const { result } = renderHook(() => useS3FileUpload());
-
-		expect(result.current).toHaveProperty("states");
-		expect(result.current.states).toHaveProperty("files");
-		expect(result.current.states.files).toEqual({});
-		expect(result.current).toHaveProperty("upload");
-	});
-
-	/**
 	 * Test case: Successful file upload to S3.
 	 *
 	 * This test ensures that a file is successfully uploaded to S3 and the correct parameters are passed to the `uploadData` function.

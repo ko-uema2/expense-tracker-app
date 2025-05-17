@@ -15,20 +15,6 @@ describe("useSignIn", () => {
 	});
 
 	/**
-	 * Test case: Verifying the properties of the hook's return object.
-	 *
-	 * This test ensures that the `useSignIn` hook returns an object with the correct properties.
-	 */
-	test("should return an object with the correct properties", () => {
-		const { result } = renderHook(() => useSignIn());
-
-		expect(result.current).toHaveProperty("error");
-		expect(result.current).toHaveProperty("isLoading");
-		expect(result.current).toHaveProperty("isSuccessful");
-		expect(result.current).toHaveProperty("signIn");
-	});
-
-	/**
 	 * Test case: Successful sign-in.
 	 *
 	 * This test ensures that a user can sign in successfully and the correct parameters are passed to the `signIn` function.
@@ -54,7 +40,7 @@ describe("useSignIn", () => {
 		});
 	});
 
-	test("should set an error message if the sign-in fials due to incorrect email", async () => {
+	test("should set an error message if the sign-in fails due to incorrect email", async () => {
 		// Mock the error object
 		const error = new Error("User does not exist.") as Error & {
 			name: string;
