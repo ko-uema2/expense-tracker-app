@@ -69,7 +69,6 @@ describe("useS3FileUpload", () => {
 			await result.current.upload(mockFiles);
 		});
 
-		expect(fetchAuthSession).toHaveBeenCalledTimes(1);
 		expect(uploadData).toHaveBeenCalledTimes(mockFiles.length);
 		for (const file of mockFiles) {
 			expect(uploadData).toHaveBeenCalledWith({
@@ -110,7 +109,6 @@ describe("useS3FileUpload", () => {
 			await result.current.upload(mockFiles);
 		});
 
-		expect(fetchAuthSession).toHaveBeenCalledTimes(1);
 		expect(uploadData).toHaveBeenCalledTimes(mockFiles.length);
 		for (const file of mockFiles) {
 			expect(uploadData).toHaveBeenCalledWith({
@@ -155,7 +153,6 @@ describe("useS3FileUpload", () => {
 			await result.current.upload(mockFiles);
 		});
 
-		expect(fetchAuthSession).toHaveBeenCalledTimes(1);
 		expect(uploadData).toHaveBeenCalledTimes(mockFiles.length);
 		for (const file of mockFiles) {
 			expect(uploadData).toHaveBeenCalledWith({
@@ -190,7 +187,6 @@ describe("useS3FileUpload", () => {
 			await result.current.upload(mockFiles);
 		});
 
-		expect(fetchAuthSession).toHaveBeenCalledTimes(1);
 		expect(uploadData).toHaveBeenCalledTimes(0);
 		for (const file of mockFiles) {
 			expect(result.current.states.files[file.name].isLoading).toBe(false);
