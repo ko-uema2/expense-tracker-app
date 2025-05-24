@@ -111,9 +111,9 @@ export const useS3FileUpload = () => {
 				const occurredError =
 					error instanceof Error &&
 					Object.values(FileUploadException).includes(
-						(error as Error).name as FileUploadException,
+						(error as AppError).code as FileUploadException,
 					)
-						? new StorageError((error as Error).name as FileUploadException)
+						? new StorageError((error as AppError).code as FileUploadException)
 						: new UnknownError();
 
 				dispatch({

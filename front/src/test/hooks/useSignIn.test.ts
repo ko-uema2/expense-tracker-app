@@ -42,10 +42,7 @@ describe("useSignIn", () => {
 
 	test("should set an error message if the sign-in fails due to incorrect email", async () => {
 		// Mock the error object
-		const error = new Error("User does not exist.") as Error & {
-			name: string;
-		};
-		error.name = SignInException.UserNotFoundException;
+		const error = new AuthError(SignInException.UserNotFoundException);
 		(signIn as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useSignIn());
@@ -67,12 +64,7 @@ describe("useSignIn", () => {
 
 	test("should set an error message if the sign-in fails due to incorrect password", async () => {
 		// Mock the error object
-		const error = new Error(
-			"メールアドレスまたはパスワードが間違っています",
-		) as Error & {
-			name: string;
-		};
-		error.name = SignInException.NotAuthorizedException;
+		const error = new AuthError(SignInException.NotAuthorizedException);
 		(signIn as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useSignIn());
@@ -92,12 +84,7 @@ describe("useSignIn", () => {
 
 	test("should set an error message if the sign-in fails due to code delivery failure", async () => {
 		// Mock the error object
-		const error = new Error(
-			"確認コードの送信に失敗しました。しばらく時間を置いてから再度お試しください。",
-		) as Error & {
-			name: string;
-		};
-		error.name = SignInException.CodeDeliveryFailureException;
+		const error = new AuthError(SignInException.CodeDeliveryFailureException);
 		(signIn as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useSignIn());
@@ -117,10 +104,7 @@ describe("useSignIn", () => {
 
 	test("should set an error message if the sign-in fails due to internal server error", async () => {
 		// Mock the error object
-		const error = new Error("認証処理で内部エラーが発生しました。") as Error & {
-			name: string;
-		};
-		error.name = SignInException.InternalErrorException;
+		const error = new AuthError(SignInException.InternalErrorException);
 		(signIn as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useSignIn());
@@ -140,10 +124,7 @@ describe("useSignIn", () => {
 
 	test("should set an error message if the sign-in fails due to an unknown error", async () => {
 		// Mock the error object
-		const error = new Error("An unknown error occurred.") as Error & {
-			name: string;
-		};
-		error.name = "UnknownError";
+		const error = new UnknownError();
 		(signIn as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useSignIn());

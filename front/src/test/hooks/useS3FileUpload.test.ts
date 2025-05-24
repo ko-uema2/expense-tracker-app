@@ -97,10 +97,7 @@ describe("useS3FileUpload", () => {
 			userSub: "test-userSub",
 		});
 		// Mock the error object
-		const error = new Error("Object is too large") as Error & {
-			name: string;
-		};
-		error.name = FileUploadException.ObjectIsTooLarge;
+		const error = new StorageError(FileUploadException.ObjectIsTooLarge);
 		(uploadData as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useS3FileUpload());
@@ -139,12 +136,8 @@ describe("useS3FileUpload", () => {
 			identityId: "test-identityId",
 			userSub: "test-userSub",
 		});
-
 		// Mock the error object
-		const error = new Error("An unknown error occurred.") as Error & {
-			name: string;
-		};
-		error.name = "UnknownError";
+		const error = new UnknownError();
 		(uploadData as jest.Mock).mockRejectedValue(error);
 
 		const { result } = renderHook(() => useS3FileUpload());
