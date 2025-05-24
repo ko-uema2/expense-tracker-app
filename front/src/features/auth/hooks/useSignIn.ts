@@ -89,9 +89,9 @@ export const useSignIn = () => {
 			const occurredError =
 				error instanceof Error &&
 				Object.values(SignInException).includes(
-					(error as Error).name as SignInException,
+					(error as AppError).code as SignInException,
 				)
-					? new AuthError((error as Error).name as SignInException)
+					? new AuthError((error as AppError).code as SignInException)
 					: new UnknownError();
 
 			dispatch({
