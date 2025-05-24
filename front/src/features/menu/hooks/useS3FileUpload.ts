@@ -92,9 +92,9 @@ export const useS3FileUpload = () => {
 			return;
 		}
 
-		const filesWithUTF8Content = await readFileAsUTF8(files);
+		const utf8Files = await readFileAsUTF8(files);
 
-		for (const file of filesWithUTF8Content) {
+		for (const file of utf8Files) {
 			dispatch({ type: "FILE_UPLOAD_START", payload: file.name });
 			try {
 				// Upload the file to S3
