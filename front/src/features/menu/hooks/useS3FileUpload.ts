@@ -92,18 +92,17 @@ export const useS3FileUpload = () => {
 			return;
 		}
 
-		for (const file of files) {
+		const filesWithUTF8Content = await readFileAsUTF8(files);
+
+		for (const file of filesWithUTF8Content) {
 			dispatch({ type: "FILE_UPLOAD_START", payload: file.name });
 			try {
-				// Read the content of the file as UTF-8 encoded text
-				const fileContent = await readFileAsUTF8(file);
-
 				// Upload the file to S3
 				await uploadData({
 					path: `private/${session.identityId}/${file.name}`,
-					data: fileContent,
+					data: file.utf8Content,
 					options: {
-						metadata: { "user-id": session.userSub },
+						metadata: { "user-id": session.userSub ?? "" },
 					},
 				});
 
@@ -132,24 +131,27 @@ export const useS3FileUpload = () => {
 };
 
 /**
- * Reads the content of a file and converts it to UTF-8 encoded text.
+ * Reads the content of each file in the array and converts it to UTF-8 encoded text.
  *
- * @param {FileWithPath} file - The file to be read.
- * @returns {Promise<string>} A Promise that resolves with the UTF-8 encoded content of the file.
+ * @param {FileWithPath[]} files - The files to be read.
+ * @returns {Promise<FileWithPath[]>} A Promise that resolves with an array of FileWithPath objects,
+ *   where each object has a new property 'utf8Content' containing the UTF-8 encoded content string.
  */
-const readFileAsUTF8 = async (file: FileWithPath): Promise<string> => {
-	const arrayBuffer = await file.arrayBuffer();
-	const uint8Array = new Uint8Array(arrayBuffer);
+const readFileAsUTF8 = async (
+	files: FileWithPath[],
+): Promise<(FileWithPath & { utf8Content: string })[]> => {
+	const results: (FileWithPath & { utf8Content: string })[] = [];
 
-	// detect encoding of the file
-	const detectedEncoding = Encoding.detect(uint8Array);
+	for (const file of files) {
+		const uint8Array = new Uint8Array(await file.arrayBuffer());
+		const detectedEncoding = Encoding.detect(uint8Array);
+		const utf8Array = Encoding.convert(uint8Array, {
+			from: detectedEncoding as Encoding.Encoding,
+			to: "UNICODE",
+		});
+		const utf8Content = Encoding.codeToString(utf8Array);
+		results.push({ ...file, name: file.name, utf8Content });
+	}
 
-	// convert the file content to UTF-8
-	const utf8Array = Encoding.convert(uint8Array, {
-		from: detectedEncoding as Encoding.Encoding,
-		to: "UNICODE",
-	});
-
-	// convert the UTF-8 array to a string
-	return Encoding.codeToString(utf8Array);
+	return results;
 };
