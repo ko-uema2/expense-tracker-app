@@ -1,23 +1,40 @@
-import { FC, memo } from "react";
+import {
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+	Input,
+} from "@/components/ui";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
-import { TextInput } from "@mantine/core";
-import { UseFormReturnType } from "@mantine/form";
-import { AuthInfo } from "@/features/auth/types";
-
-type Props = {
-  form: UseFormReturnType<AuthInfo, (values: AuthInfo) => AuthInfo>;
-};
-
-export const Email: FC<Props> = memo(({ form }) => {
-  return (
-    <TextInput
-      label="Email"
-      placeholder="hello@example.com"
-      autoFocus
-      required
-      {...form.getInputProps("email")}
-    />
-  );
-});
-
-Email.displayName = "Email";
+// ジェネリックでformとnameを受け取る
+interface EmailProps<T extends FieldValues> {
+	form: UseFormReturn<T>;
+	disabled?: boolean;
+}
+export const Email = <T extends FieldValues>({
+	form,
+	disabled,
+}: EmailProps<T>) => (
+	<FormField
+		control={form.control}
+		name={"email" as Path<T>}
+		render={({ field }) => (
+			<FormItem>
+				<FormLabel>メールアドレス</FormLabel>
+				<FormControl>
+					<Input
+						id="email"
+						type="email"
+						placeholder="your@email.com"
+						className="h-12 box-border"
+						disabled={disabled}
+						{...field}
+					/>
+				</FormControl>
+				<FormMessage />
+			</FormItem>
+		)}
+	/>
+);
