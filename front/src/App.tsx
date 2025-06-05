@@ -1,5 +1,5 @@
 import { AppProvider } from "@/providers/AppProvider";
-import { AppRoutes } from "@/routes";
+import { AppRouter } from "@/routes/AppRouter";
 import { Amplify } from "aws-amplify";
 
 Amplify.configure({
@@ -29,7 +29,7 @@ Amplify.configure({
 function App() {
 	return (
 		<AppProvider>
-			<AppRoutes />
+			<AppRouter />
 		</AppProvider>
 	);
 }

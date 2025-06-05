@@ -1,1 +1,2 @@
-export * from "./AppAlert";
+export * from "./Alert";
+export * from "./BaseModal";
