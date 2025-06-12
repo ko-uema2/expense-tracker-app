@@ -1,3 +1,4 @@
+import type { AuthException } from "@/features/auth/error/type";
 import type { ErrorDefinition, errorLevel } from "@/utils/error";
 
 export enum SignInException {
@@ -19,7 +20,16 @@ export enum SignInException {
 	SignInNetworkException = "SignInNetworkException",
 }
 
-function createError<T extends SignInException>(
+export enum SignUpException {
+	AliasExistsException = "AliasExistsException",
+	CodeDeliveryFailureException = "CodeDeliveryFailureException",
+	InvalidParameterException = "InvalidParameterException",
+	LimitExceededException = "LimitExceededException",
+	UsernameExistsException = "UsernameExistsException",
+	SignUpNetworkException = "SignUpNetworkException",
+}
+
+function createError<T extends AuthException>(
 	title: string,
 	message: string,
 	errorCode: T,
@@ -33,7 +43,7 @@ function createError<T extends SignInException>(
 	} as const;
 }
 
-export const AUTH_ERROR = {
+export const SIGNIN_ERROR = {
 	// Error: The confirmation code could not be sent.
 	[SignInException.CodeDeliveryFailureException]: createError(
 		"認証エラー",
@@ -111,13 +121,6 @@ export const AUTH_ERROR = {
 		SignInException.UnauthorizedException,
 		"error",
 	),
-	// Error: The email address is already registered.
-	[SignInException.UsernameExistsException]: createError(
-		"サインアップエラー",
-		"メールアドレスがすでに登録されています。別のメールアドレスをお試しください。",
-		SignInException.UsernameExistsException,
-		"error",
-	),
 	// Error: The user is not confirmed.
 	[SignInException.UserNotConfirmedException]: createError(
 		"認証エラー",
@@ -135,9 +138,54 @@ export const AUTH_ERROR = {
 	// unchecked exception
 } as const;
 
+export const SIGNUP_ERROR = {
+	[SignUpException.AliasExistsException]: createError(
+		"サインアップエラー",
+		"入力したメールアドレスまたは電話番号は別のアカウントで利用されています。他のメールアドレスまたは電話番号をお試しください。",
+		SignUpException.AliasExistsException,
+		"error",
+	),
+	[SignUpException.CodeDeliveryFailureException]: createError(
+		"認証エラー",
+		"確認コードの送信に失敗しました。しばらく時間を置いてから再度お試しください。",
+		SignUpException.CodeDeliveryFailureException,
+		"error",
+	),
+	[SignUpException.InvalidParameterException]: createError(
+		"認証エラー",
+		"入力された情報が無効です。入力内容を確認してください。",
+		SignUpException.InvalidParameterException,
+		"error",
+	),
+	[SignUpException.LimitExceededException]: createError(
+		"認証エラー",
+		"リクエストの制限を超えました。しばらく時間を置いてから再度お試しください。",
+		SignUpException.LimitExceededException,
+		"error",
+	),
+	// Error: The email address is already registered.
+	[SignUpException.UsernameExistsException]: createError(
+		"サインアップエラー",
+		"メールアドレスがすでに登録されています。別のメールアドレスをお試しください。",
+		SignUpException.UsernameExistsException,
+		"error",
+	),
+	[SignUpException.SignUpNetworkException]: createError(
+		"ネットワークエラー",
+		"サインアップ処理でネットワークエラーが発生しました。利用端末のネットワーク環境を確認してください。解決しない場合は、開発者にお問い合わせください。",
+		SignUpException.SignUpNetworkException,
+		"fatal",
+	),
+} as const;
+
+export const AUTH_ERROR = {
+	...SIGNIN_ERROR,
+	...SIGNUP_ERROR,
+} as const;
+
 /**
  * Error definition for each error code.
- * @type {Record<SignInException, ErrorDefinition<SignInException>>}
+ * @type {Record<AuthException, ErrorDefinition<AuthException>>}
  * @constant
  * @alias authErrorDefinition
  * @memberof module:features/auth/error
@@ -155,4 +203,4 @@ export const AUTH_ERROR = {
  */
 export const authErrorDefinition = Object.fromEntries(
 	Object.entries(AUTH_ERROR).map(([, value]) => [value.errorCode, value]),
-) as Record<SignInException, ErrorDefinition<SignInException>>;
+) as Record<AuthException, ErrorDefinition<AuthException>>;

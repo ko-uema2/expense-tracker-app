@@ -1,18 +1,16 @@
-import {
-	type SignInException,
-	authErrorDefinition,
-} from "@/features/auth/error";
+import { authErrorDefinition } from "@/features/auth/error/const";
+import type { AuthException } from "@/features/auth/error/type";
 import { AppError, UnknownError } from "@/utils/error";
 
 export class AuthError extends AppError {
-	constructor(code: SignInException) {
+	constructor(code: AuthException) {
 		const errorDefinition = authErrorDefinition[code];
-		const { title, message, errorCode, level } = errorDefinition;
-
 		// set default error message if errorDefinition is not found
 		if (!errorDefinition) {
 			throw new UnknownError();
 		}
+
+		const { title, message, errorCode, level } = errorDefinition;
 
 		// set error message
 		super(title, message, errorCode, level);

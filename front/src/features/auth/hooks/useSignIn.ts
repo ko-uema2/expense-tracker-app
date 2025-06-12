@@ -1,17 +1,18 @@
-import { AuthError, SignInException } from "@/features/auth/error";
-import type { AuthInfo } from "@/features/auth/types";
+import { SignInException } from "@/features/auth/error/const";
+import { AuthError } from "@/features/auth/error/error";
+import type { SignInInfo } from "@/features/auth/types";
 import { type AppError, NoError, UnknownError } from "@/utils/error";
 import { signIn as cognitoSignIn } from "aws-amplify/auth";
-import { useReducer } from "react";
+import { useCallback, useReducer } from "react";
 
-// // Define the shape of the state object
+// Define the shape of the state object
 type State = {
 	isLoading: boolean;
 	isSuccessful: boolean;
 	error: AppError;
 };
 
-// // Define the shape of the action object
+// Define the shape of the action object
 type Action =
 	| {
 			type: "SIGN_IN_START";
@@ -74,8 +75,8 @@ export const useSignIn = () => {
 	 * @param {AuthInfo} authInfo - An object containing the user's email and password.
 	 * @returns {Promise<void>} A Promise that resolves when the sign-in is complete, or rejects with an error if the sign-in fails.
 	 */
-	const signIn = async (authInfo: AuthInfo): Promise<void> => {
-		const { email, password } = authInfo;
+	const signIn = useCallback(async (signInInfo: SignInInfo): Promise<void> => {
+		const { email, password } = signInInfo;
 		dispatch({ type: "SIGN_IN_START" });
 
 		try {
@@ -99,7 +100,7 @@ export const useSignIn = () => {
 				payload: occurredError,
 			});
 		}
-	};
+	}, []);
 
 	return {
 		...state,
