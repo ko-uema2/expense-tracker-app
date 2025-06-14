@@ -1,0 +1,65 @@
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    // 既存の Chrome/Vite 設定は省略…
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      // ← ここで実行する Node.js を指定。通常はシステムの PATH から node が参照されます
+      "runtimeExecutable": "/Users/uematsukosuke/.nvm/versions/node/v22.14.0/bin/node",
+      // front 配下の jest バイナリを直接叩く
+      "program": "${workspaceFolder}/front/node_modules/jest/bin/jest.js",
+      // シングルスレッド実行／ウォッチオフ／キャッシュオフ
+      "args": [
+        "--runInBand",
+        "--watchAll=false",
+        "--no-cache"
+      ],
+      // カレントディレクトリは front
+      "cwd": "${workspaceFolder}/front",
+      // 起動直後にデバッガで一時停止
+      "runtimeArgs": [
+        "--inspect-brk"
+      ],
+      // 統合ターミナルでログを見やすく
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      // Node.js 内部モジュールでは止めない
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Debug Jest Current File",
+      "type": "node",
+      "request": "launch",
+      // Node 実行ファイルのフルパスを指定
+      "runtimeExecutable": "/Users/uematsukosuke/.nvm/versions/node/v22.14.0/bin/node",
+      // front 配下の jest バイナリを直打ち
+      "program": "${workspaceFolder}/front/node_modules/jest/bin/jest.js",
+      // --inspect-brk で起動直後に一時停止、
+      // --runInBand でシングルスレッド、
+      // --watchAll=false, --no-cache で高速デバッグ
+      // 最後に ${file} を渡すことで「今見ているファイルだけ」をテスト対象に
+      "args": [
+        "--runInBand",
+        "--watchAll=false",
+        "--no-cache",
+        "${file}"
+      ],
+      // カレントディレクトリを front に
+      "cwd": "${workspaceFolder}/front",
+      // 起動直後にデバッガで一時停止
+      "runtimeArgs": [
+        "--inspect"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    }
+  ]
+}
