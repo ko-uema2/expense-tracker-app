@@ -119,34 +119,36 @@ export const useCSVFileUpload = () => {
 
 			const utf8Files = await readFileAsUTF8(files);
 
-			for (const file of utf8Files) {
-				dispatch({ type: "FILE_UPLOAD_START", payload: file.name });
-				try {
-					await uploadData({
-						path: `private/${session?.identityId}/${file.name}`,
-						data: file.utf8Content,
-						options: {
-							metadata: { "user-id": session?.userSub ?? "" },
-						},
-					});
-					dispatch({ type: "FILE_UPLOAD_SUCCESS", payload: file.name });
-				} catch (error: unknown) {
-					const occurredError =
-						error instanceof Error &&
-						Object.values(FileUploadException).includes(
-							(error as AppError).code as FileUploadException,
-						)
-							? new StorageError(
-									(error as AppError).code as FileUploadException,
-								)
-							: new UnknownError();
+			await Promise.all(
+				utf8Files.map(async (file) => {
+					dispatch({ type: "FILE_UPLOAD_START", payload: file.name });
+					try {
+						await uploadData({
+							path: `private/${session?.identityId}/${file.name}`,
+							data: file.utf8Content,
+							options: {
+								metadata: { "user-id": session?.userSub ?? "" },
+							},
+						});
+						dispatch({ type: "FILE_UPLOAD_SUCCESS", payload: file.name });
+					} catch (error: unknown) {
+						const occurredError =
+							error instanceof Error &&
+							Object.values(FileUploadException).includes(
+								(error as AppError).code as FileUploadException,
+							)
+								? new StorageError(
+										(error as AppError).code as FileUploadException,
+									)
+								: new UnknownError();
 
-					dispatch({
-						type: "FILE_UPLOAD_FAILURE",
-						payload: { fileNames: file.name, error: occurredError },
-					});
-				}
-			}
+						dispatch({
+							type: "FILE_UPLOAD_FAILURE",
+							payload: { fileNames: file.name, error: occurredError },
+						});
+					}
+				}),
+			);
 		},
 		[fetchAuthSession, session, error],
 	);
